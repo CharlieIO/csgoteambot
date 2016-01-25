@@ -15,9 +15,12 @@ dist/
 downloads/
 eggs/
 .eggs/
+Include/
 lib/
+Lib/
 lib64/
 parts/
+Scripts/
 sdist/
 var/
 *.egg-info/
