@@ -14,7 +14,7 @@ def scrape(team):
 
 
 def get_team(comment):
-    comment = comment.lower().split()
+    comment = comment.split()
     for num in range(len(comment)):
         if list[num] == '!roster' or '!team':
             return list[num + 1]
