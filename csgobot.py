@@ -10,13 +10,16 @@ def scrape(team):
     con = urllib2.urlopen(req)
     source = con.read()
     players = re.findall(r'">(.*?)</a></td>', source)
-    return str(players)
+    if len(players) >= 1:
+        return str(players)
+    else:
+        return 'I could not find a team on HLTV with the name ' + team
 
 
 def get_team(comment):
     comment = str(comment).split()
     for num in range(len(comment)):
-        if comment[num] == '!roster' or '!team':
+        if comment[num] == '!roster' or comment[num] == '!team':
             return str(comment[num + 1])
 
 
