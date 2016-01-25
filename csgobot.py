@@ -10,14 +10,14 @@ def scrape(team):
     con = urllib2.urlopen(req)
     source = con.read()
     players = re.findall(r'">(.*?)</a></td>', source)
-    return players
+    return str(players)
 
 
 def get_team(comment):
     comment = str(comment).split()
     for num in range(len(comment)):
         if comment[num] == '!roster' or '!team':
-            return comment[num + 1]
+            return str(comment[num + 1])
 
 
 r = praw.Reddit('An easy way to access team rosters.')
@@ -28,7 +28,6 @@ while True:
     subreddit = r.get_subreddit('globaloffensive')
     print subreddit
     comments = subreddit.get_comments()
-
     print comments
     flat_comments = praw.helpers.flatten_tree(comments)
     for comment in flat_comments:
