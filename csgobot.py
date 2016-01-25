@@ -43,7 +43,7 @@ while True:
             members = tscrape(team)
             stats = statscrape(team)
             if len(members) >= 1:
-                format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%n | %r'*len(members))
+                format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %r'*len(members))
                 comment.reply('Information for **'+team.upper()+'**' + (format_text % (tuple(members),tuple(stats))))
                 already_done.append(comment.id)
             else:
