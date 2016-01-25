@@ -44,11 +44,15 @@ while True:
             members = tscrape(team)
             pstats, tstats = statscrape(team)
             if len(members) >= 1:
+                unite = []
+                for num in range(len(members)):
+                    unite.append(members[num])
+                    unite.append(pstats[num])
                 statfill = '\n\n**Wins:**%s' + '\n**Draws:**%s' + '\n**Losses:**%s' + '\n**Rounds Played:**%s'
                 format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %s' * len(members)) + (
                 statfill % (tuple(tstats)))
                 comment.reply(
-                    'Information for **' + team.upper() + '**' + (format_text % (tuple(members), tuple(pstats))))
+                    'Information for **' + team.upper() + '**' + (format_text % (tuple(unite))))
                 already_done.append(comment.id)
             else:
                 comment.reply('I cannot find a team on HLTV by the name of ' + team + '.')
