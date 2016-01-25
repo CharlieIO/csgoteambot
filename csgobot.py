@@ -59,7 +59,7 @@ while True:
                     pass
                 try:
                     comment.reply(
-                            'Information for **' + team.upper() + '**:' + (format_text % (tuple(unite))))
+                            'Information for **' + team.strip().upper() + '**:' + (format_text % (tuple(unite))))
                 except:
                     pass
                 already_done.append(comment.id)
