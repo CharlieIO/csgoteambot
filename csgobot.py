@@ -27,7 +27,7 @@ already_done = []
 while True:
     subreddit = r.get_subreddit('globaloffensive')
     comments = subreddit.get_comments()
-    print subreddis
+    print subreddits
     flat_comments = praw.helpers.flatten_tree(comments)
     for comment in flat_comments:
         has_call = rcall[0] in comment.body or rcall[1] in comment.body
