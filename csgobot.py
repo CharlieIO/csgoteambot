@@ -69,7 +69,7 @@ while True:
                 try:
                     format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %s' * len(members)) + (
                         statfill % (tuple(tstats))) + '\n\n**Win/Loss Percentage:** ' + str(
-                        float(tstats[0]) / float(tstats[2]))
+                        round(float(tstats[0]) / float(tstats[2])),2)
                 except:
                     pass
                 try:
