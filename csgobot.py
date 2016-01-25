@@ -39,4 +39,4 @@ while True:
             already_done.append(comment.id)
             print "Comment posted"
     print 'sleeping'
-    time.sleep(60)
+    time.sleep(5)
