@@ -3,6 +3,20 @@ import time
 import os
 import urllib2
 import re
+import psycopg2
+import urlparse
+
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+)
+cur = conn.cursor()
 
 
 def tscrape(team):
@@ -54,12 +68,14 @@ while True:
                     pass
                 try:
                     format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %s' * len(members)) + (
-                        statfill % (tuple(tstats)))
+                        statfill % (tuple(tstats))) + '\n\n**Win/Loss Percentage:** ' + str(
+                        float(tstats[0]) / float(tstats[2]))
                 except:
                     pass
                 try:
                     comment.reply(
-                            'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + (format_text % (tuple(unite))))
+                            'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + (
+                            format_text % (tuple(unite))))
                 except:
                     pass
                 already_done.append(comment.id)
