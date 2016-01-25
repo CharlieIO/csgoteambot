@@ -5,12 +5,19 @@ import urllib2
 import re
 
 
-def scrape(team):
+def tscrape(team):
     req = urllib2.Request('http://www.hltv.org/?pageid=152&query=' + team, headers={'User-Agent': "Magic Browser"})
     con = urllib2.urlopen(req)
     source = con.read()
     players = re.findall(r'">(.*?)</a></td>', source)
     return players
+
+def statscrape(team):
+    req = urllib2.Request('http://www.hltv.org/?pageid=152&query=' + team, headers={'User-Agent': "Magic Browser"})
+    con = urllib2.urlopen(req)
+    source = con.read()
+    stats = re.findall(r'<td style="text-align: right;">(.*?)</td>', source)
+    return stats
 
 
 def get_team(comment):
@@ -33,10 +40,11 @@ while True:
         has_call = rcall[0] in comment.body or rcall[1] in comment.body
         if comment.id not in already_done and has_call:
             team = get_team(comment)
-            members = scrape(team)
+            members = tscrape(team)
+            stats = statscrape(team)
             if len(members) >= 1:
-                format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | 0'*len(members))
-                comment.reply(str('Information for **'+team.upper()+'**' + (format_text % tuple(members))))
+                format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%n | %r'*len(members))
+                comment.reply('Information for **'+team.upper()+'**' + (format_text % (tuple(members),tuple(stats))))
                 already_done.append(comment.id)
             else:
                 comment.reply('I cannot find a team on HLTV by the name of ' + team + '.')
