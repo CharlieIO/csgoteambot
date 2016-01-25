@@ -29,4 +29,5 @@ while True:
         if comment.id not in already_done and has_call:
             comment.reply(scrape(get_team(comment)))
             already_done.append(comment.id)
+            print "Comment posted for" + get_team(comment)
     time.sleep(600)
