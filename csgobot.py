@@ -37,7 +37,7 @@ while True:
         if comment.id not in already_done and has_call:
             team = get_team(comment)
             members = scrape(team)
-            format_text = '\n\n**Roster**|' + ('\n\n%s\n\n*'*len(members))
+            format_text = '\n\n**Roster**|' + '\n\n:--|' + ('\n\n%s'*len(members))
             comment.reply('Information for **'+team.upper()+'**' + (format_text % members))
             already_done.append(comment.id)
             print "Comment posted."
