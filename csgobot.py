@@ -27,10 +27,9 @@ already_done = []
 while True:
     subreddit = r.get_subreddit('globaloffensive')
     comments = subreddit.get_comments()
-    print subreddit
-    print comments
     flat_comments = praw.helpers.flatten_tree(comments)
     for comment in flat_comments:
+        print comment
         has_call = rcall[0] in comment.body or rcall[1] in comment.body
         if comment.id not in already_done and has_call:
             comment.reply(scrape(get_team(comment)))
