@@ -43,20 +43,29 @@ while True:
             team = get_team(comment)
             members = tscrape(team)
             pstats, tstats = statscrape(team)
+            statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
             if len(members) >= 1:
                 unite = []
-                for num in range(len(members)):
-                    unite.append(members[num])
-                    unite.append(pstats[num])
-                statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
-                format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %s' * len(members)) + (
-                statfill % (tuple(tstats)))
-                comment.reply(
-                    'Information for **' + team.upper() + '**:' + (format_text % (tuple(unite))))
+                try:
+                    for num in range(len(members)):
+                        unite.append(members[num])
+                        unite.append(pstats[num])
+                except:
+                    pass
+                try:
+                    format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %s' * len(members)) + (
+                        statfill % (tuple(tstats)))
+                except:
+                    pass
+                try:
+                    comment.reply(
+                            'Information for **' + team.upper() + '**:' + (format_text % (tuple(unite))))
+                except:
+                    pass
                 already_done.append(comment.id)
             else:
                 comment.reply('I cannot find a team on HLTV by the name of ' + team + '.')
                 already_done.append(comment.id)
             print "~~~~~~~~~Comment posted.~~~~~~~~~"
     print 'sleeping'
-    time.sleep(5)
+    time.sleep(20)
