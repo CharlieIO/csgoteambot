@@ -12,7 +12,7 @@ def scrape(team):
 
 def get_team(comment):
     comment = comment.lower().split()
-    for num in range(len(list)):
+    for num in range(len(comment)):
         if list[num] == '!roster' or '!team':
             return list[num+1]
 
@@ -29,5 +29,5 @@ while True:
         if comment.id not in already_done and has_call:
             comment.reply(scrape(get_team(comment)))
             already_done.append(comment.id)
-            print "Comment posted for" + get_team(comment)
+            print "Comment posted"
     time.sleep(600)
