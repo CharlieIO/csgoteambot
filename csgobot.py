@@ -14,7 +14,7 @@ def scrape(team):
 
 
 def get_team(comment):
-    comment = comment.split()
+    str(comment)
     for num in range(len(comment)):
         if list[num] == '!roster' or '!team':
             return list[num + 1]
@@ -40,4 +40,4 @@ while True:
             already_done.append(comment.id)
             print "Comment posted"
     print 'found'
-    time.sleep(15)
+    time.sleep(3)
