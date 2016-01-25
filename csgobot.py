@@ -35,7 +35,7 @@ while True:
             team = get_team(comment)
             members = scrape(team)
             if len(members) >= 1:
-                format_text = '\n\n**Roster**|' + '\n\n:--|' + ('\n\n%s'*len(members))
+                format_text = '\n\n**Roster**|' + '\n\n:--|' + ('\n\n%s|'*len(members))
                 comment.reply('Information for **'+team.upper()+'**' + (format_text % tuple(members)))
                 already_done.append(comment.id)
             else:
