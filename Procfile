@@ -1,1 +1,1 @@
-worker : python csgobot.py
+worker: python csgobot.py
