@@ -27,7 +27,7 @@ already_done = []
 while True:
     subreddit = r.get_subreddit('globaloffensive')
     comments = subreddit.get_comments()
-    print comments
+    print subreddis
     flat_comments = praw.helpers.flatten_tree(comments)
     for comment in flat_comments:
         has_call = rcall[0] in comment.body or rcall[1] in comment.body
@@ -36,4 +36,4 @@ while True:
             already_done.append(comment.id)
             print "Comment posted"
     print 'sleeping'
-    time.sleep(3)
+    time.sleep(60)
