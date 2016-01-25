@@ -10,10 +10,7 @@ def scrape(team):
     con = urllib2.urlopen(req)
     source = con.read()
     players = re.findall(r'">(.*?)</a></td>', source)
-    if len(players) >= 1:
-        return players
-    else:
-        return 'I could not find a team on HLTV with the name ' + team + '.'
+    return players
 
 
 def get_team(comment):
@@ -37,9 +34,12 @@ while True:
         if comment.id not in already_done and has_call:
             team = get_team(comment)
             members = scrape(team)
-            format_text = '\n\n**Roster**|' + '\n\n:--|' + ('\n\n%s'*len(members))
-            comment.reply('Information for **'+team.upper()+'**' + (format_text % tuple(members)))
-            already_done.append(comment.id)
+            if len(members) >= 1:
+                format_text = '\n\n**Roster**|' + '\n\n:--|' + ('\n\n%s'*len(members))
+                comment.reply('Information for **'+team.upper()+'**' + (format_text % tuple(members)))
+                already_done.append(comment.id)
+            else:
+                comment.reply('I cannot find a team on HLTV by the name of ' + team + '.')
             print "Comment posted."
     print 'sleeping'
     time.sleep(5)
