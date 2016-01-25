@@ -46,9 +46,9 @@ while True:
             if len(members) >= 1:
                 statfill = '\n\n**Wins:**%s' + '\n**Draws:**%s' + '\n**Losses:**%s' + '\n**Rounds Played:**%s'
                 format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %s' * len(members)) + (
-                statfill % tuple(tstats))
+                statfill % (tuple(tstats)))
                 comment.reply(
-                    'Information for **' + team.upper() + '**' + (format_text % (tuple(members), tuple(pstats))))
+                    'Information for **' + team.upper() + '**' + (format_text % (members, pstats)))
                 already_done.append(comment.id)
             else:
                 comment.reply('I cannot find a team on HLTV by the name of ' + team + '.')
