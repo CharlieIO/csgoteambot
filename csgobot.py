@@ -48,15 +48,15 @@ while True:
                 for num in range(len(members)):
                     unite.append(members[num])
                     unite.append(pstats[num])
-                statfill = '\n\n**Wins:**%s' + '\n**Draws:**%s' + '\n**Losses:**%s' + '\n**Rounds Played:**%s'
+                statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
                 format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %s' * len(members)) + (
                 statfill % (tuple(tstats)))
                 comment.reply(
-                    'Information for **' + team.upper() + '**' + (format_text % (tuple(unite))))
+                    'Information for **' + team.upper() + '**:' + (format_text % (tuple(unite))))
                 already_done.append(comment.id)
             else:
                 comment.reply('I cannot find a team on HLTV by the name of ' + team + '.')
                 already_done.append(comment.id)
-            print "Comment posted."
+            print "~~~~~~~~~Comment posted.~~~~~~~~~"
     print 'sleeping'
     time.sleep(5)
