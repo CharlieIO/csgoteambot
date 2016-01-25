@@ -12,12 +12,13 @@ def tscrape(team):
     players = re.findall(r'">(.*?)</a></td>', source)
     return players
 
+
 def statscrape(team):
     req = urllib2.Request('http://www.hltv.org/?pageid=152&query=' + team, headers={'User-Agent': "Magic Browser"})
     con = urllib2.urlopen(req)
     source = con.read()
     stats = re.findall(r'<td style="text-align: right;">(.*?)</td>', source)
-    return stats
+    return stats[:5], stats[5:]
 
 
 def get_team(comment):
@@ -41,11 +42,13 @@ while True:
         if comment.id not in already_done and has_call:
             team = get_team(comment)
             members = tscrape(team)
-            stats = statscrape(team)
+            pstats, tstats = statscrape(team)
             if len(members) >= 1:
-                statfill = '\n\n**Wins:**%r' + '\n**Draws:**%r' + '\n**Losses:**%r' + '\n**Rounds Played:**%r'
-                format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %r'*len(members)) + statfill
-                comment.reply('Information for **'+team.upper()+'**' + (format_text % (tuple(members),tuple(stats))))
+                statfill = '\n\n**Wins:**%s' + '\n**Draws:**%s' + '\n**Losses:**%s' + '\n**Rounds Played:**%s'
+                format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %s' * len(members)) + (
+                statfill % tuple(tstats))
+                comment.reply(
+                    'Information for **' + team.upper() + '**' + (format_text % (tuple(members), tuple(pstats))))
                 already_done.append(comment.id)
             else:
                 comment.reply('I cannot find a team on HLTV by the name of ' + team + '.')
