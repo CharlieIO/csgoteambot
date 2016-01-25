@@ -38,7 +38,7 @@ while True:
             team = get_team(comment)
             members = scrape(team)
             format_text = '\n\n**Roster**|' + '\n\n:--|' + ('\n\n%s'*len(members))
-            comment.reply('Information for **'+team.upper()+'**' + (format_text % members))
+            comment.reply('Information for **'+team.upper()+'**' + (format_text % tuple(members)))
             already_done.append(comment.id)
             print "Comment posted."
     print 'sleeping'
