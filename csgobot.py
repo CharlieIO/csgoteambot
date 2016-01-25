@@ -40,6 +40,7 @@ while True:
                 already_done.append(comment.id)
             else:
                 comment.reply('I cannot find a team on HLTV by the name of ' + team + '.')
+                already_done.append(comment.id)
             print "Comment posted."
     print 'sleeping'
     time.sleep(5)
