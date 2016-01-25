@@ -44,7 +44,7 @@ while True:
             members = tscrape(team)
             pstats, tstats = statscrape(team)
             statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
-            if len(members) >= 1:
+            if len(members) >= 1 and team != '!roster' and team != '!team':
                 unite = []
                 try:
                     for num in range(len(members)):
@@ -62,9 +62,6 @@ while True:
                             'Information for **' + team.upper() + '**:' + (format_text % (tuple(unite))))
                 except:
                     pass
-                already_done.append(comment.id)
-            else:
-                comment.reply('I cannot find a team on HLTV by the name of ' + team + '.')
                 already_done.append(comment.id)
             print "~~~~~~~~~Comment posted.~~~~~~~~~"
     print 'sleeping'
