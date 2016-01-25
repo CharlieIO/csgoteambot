@@ -48,7 +48,7 @@ while True:
                 format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | %s' * len(members)) + (
                 statfill % (tuple(tstats)))
                 comment.reply(
-                    'Information for **' + team.upper() + '**' + (format_text % (members, pstats)))
+                    'Information for **' + team.upper() + '**' + (format_text % (tuple(members), tuple(pstats))))
                 already_done.append(comment.id)
             else:
                 comment.reply('I cannot find a team on HLTV by the name of ' + team + '.')
