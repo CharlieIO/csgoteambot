@@ -21,7 +21,7 @@ def teamlinks():
     print soup.prettify()
     for link in soup.find_all('a', href=True):
         if re.findall('pageid=179', link['href']):
-            namelink[link.get_text().strip()] = link.get('href')
+            namelink[link.get_text().encode('latin1').strip()] = link.get('href')
     return namelink
 
 
