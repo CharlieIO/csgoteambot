@@ -35,16 +35,17 @@ def pstats(plink):
     for stat in soup.find_all(style="font-weight:normal;width:100px;float:left;text-align:right;color:black"):
         if '%' in stat.get_text():
             stats += [stat.get_text().replace('%', '')]
-        elif '-' in stat.get_text():
-            stats += [stat.get_text().replace('-', '99')]
         else:
             stats += [stat.get_text()]
     for stat in soup.find_all(style="font-weight:normal;width:185px;float:left;text-align:right;color:black;"):
-        personalstats += [stat.get_text()]
+        if '-' == stat.get_text():
+            personalstats += [stat.get_text().replace('-', '')]
+        else:
+            personalstats += [stat.get_text()]
     for stat in soup.find_all(style="font-weight:normal;width:100px;float:left;text-align:right;color:black;font-weight:bold"):
         stats += [stat.get_text()]
-    return personalstats[0], personalstats[1], personalstats[3], stats[0], stats[1], stats[2], stats[
-        9]  # name, age, team, K, HSP, D, Rating
+    return personalstats[0], personalstats[1], personalstats[3], stats[0], stats[1], stats[2], stats[9]
+    # name, age, team, K, HSP, D, Rating
 
 
 def show_table():
