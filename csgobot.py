@@ -107,7 +107,7 @@ def player_database_update(player, name, age, team, k, d, hsp, rating, link):
     cur = conn.cursor()
     cur.execute("SELECT PLAYER FROM CSGO_PLAYERS")
     nameslist = cur.fetchall()
-    if (player,) not in nameslist:
+    if (player.encode('latin1'),) not in nameslist:
         cur.execute(
                 "INSERT INTO CSGO_PLAYERS (PLAYER, IRLNAME, AGE, TEAM, KILLS, DEATHS, HSP, RATING, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (player, name, age, team, k, d, hsp, rating, link))
@@ -137,7 +137,7 @@ def team_database_update(tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, lin
     cur = conn.cursor()
     cur.execute("SELECT TEAM_NAME FROM csgo_teams")
     nameslist = cur.fetchall()
-    if (tname,) not in nameslist:
+    if (tname.encode('latin1'),) not in nameslist:
         cur.execute(
                 "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, link))
@@ -168,11 +168,10 @@ def tscrape(teamlink):
     soup = BeautifulSoup(source, 'html.parser')
     playerlink = {}
     counter = 0
-
     while counter < 5:
         for link in soup.find_all('a', href=True):
-            if re.findall('pageid=173', link['href']):
-                if '(' in link.get_text():
+            if re.findall('pageid=173', link['href']) and counter < 5:
+                if '(' in link.get_text() and counter < 5:
                     playerlink[link.get_text().split(' (')[0]] = link.get('href')
                     players += [link.get_text().split(' (')[0]]
                     counter += 1
