@@ -71,7 +71,9 @@ def database_update(tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, link):
     cur.execute("SELECT TEAM_NAME FROM CSGO_TEAMS")
     nameslist = cur.fetchall()
     if (tname,) not in nameslist:
-        cur.execute("INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, link))
+        cur.execute(
+            "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, link))
         print '\nNew Team Added Successfullly'
     else:
         cur.execute("UPDATE CSGO_TEAMS SET TEAM_NAME=(%s) WHERE TEAM_NAME= (%s)", (tname, tname))
@@ -102,7 +104,7 @@ def tscrape(teamlink):
         if re.findall('pageid=173', link['href']):
             if '(' in link.get_text():
                 players += [link.get_text().split(' (')[0]]
-    return players[0], players[1], players[2], players[3], players[4] #top 5 players by rounds played
+    return players[0], players[1], players[2], players[3], players[4]  # top 5 players by rounds played
 
 
 def statscrape(teamlink):
@@ -116,8 +118,10 @@ def statscrape(teamlink):
         windrawloss = stat.get_text().split(' / ')
     for stat in soup.find_all(style="font-weight:normal;width:180px;float:left;color:black;text-align:right;"):
         otherstats += [stat.get_text()]
-    return windrawloss[0],windrawloss[1],windrawloss[2], otherstats[0], otherstats[1], otherstats[2], otherstats[3], otherstats[4] #win, draw, loss
-    #other stats are maps played, total kills, total deaths, rounds played, K/D ratio
+    return windrawloss[0], windrawloss[1], windrawloss[2], otherstats[0], otherstats[1], otherstats[2], otherstats[3], \
+           otherstats[4]  # win, draw, loss
+    # other stats are maps played, total kills, total deaths, rounds played, K/D ratio
+
 
 def get_team(comment):
     comment = str(comment).split()
@@ -125,10 +129,12 @@ def get_team(comment):
         if comment[num] == '!roster' or comment[num] == '!team':
             return str(comment[num + 1])
 
+
 r = praw.Reddit('An easy way to access team rosters.')
 r.login(os.environ['REDDIT_USER'], os.environ['REDDIT_PASS'])
 rcall = ['!roster', '!team']
 already_done = []
+forbidden = '+%\\*'
 while True:
     conn = psycopg2.connect(
             database=url.path[1:],
@@ -147,9 +153,12 @@ while True:
         if comment.id not in already_done and has_call:
             team = get_team(comment.body)
             statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
-            if team != '!roster' and team != '!team' and '%' not in team and '\\' not in team:
+            if team != '!roster' and team != '!team' and any((c in forbidden) for c in team) == -1:
                 try:
-                    cur.execute("SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME) LIKE UPPER((%s)) LIMIT 1", ('%' + team + '%',))
+                    if team.upper() == 'VP':
+                        team.replace('VP', 'Virtus.Pro')
+                    cur.execute("SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME) LIKE UPPER((%s)) LIMIT 1",
+                                ('%' + team + '%',))
                     stats = cur.fetchall()
                     print stats
                     tstats = stats[0][6:10]
@@ -161,8 +170,9 @@ while True:
                     print '~~~~~~ERROR1~~~~~~'
                     pass
                 try:
-                    format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | Rating is under maintnance.' * 5) + (
-                        statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
+                    format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + (
+                    '\n%s | Rating will be added soon.' * 5) + (
+                                      statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
                             round((float(tstats[0]) / float(tstats[2])), 2))
                 except:
                     print '~~~~~~ERROR2~~~~~~'
@@ -170,7 +180,8 @@ while True:
                 try:
                     comment.reply(
                             'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + (
-                                format_text % (tuple(players))) + '\n\n [Powered by HLTV](http://www.hltv.org/' + link + ')')
+                                format_text % (
+                                tuple(players))) + '\n\n [Powered by HLTV](http://www.hltv.org/' + link + ') \n\n [GitHub Source](https://github.com/Charrod/csgoteambot)')
                 except:
                     print '~~~~~~ERROR3~~~~~~'
                     pass
