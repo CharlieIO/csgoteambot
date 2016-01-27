@@ -162,7 +162,7 @@ while True:
                     pass
                 try:
                     format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | Rating is under maintnance.' * 5) + (
-                        statfill % (tuple(tstats))) + '\n\n**Win/Loss Percentage:** ' + str(
+                        statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
                             round((float(tstats[0]) / float(tstats[2])), 2))
                 except:
                     print '~~~~~~ERROR2~~~~~~'
