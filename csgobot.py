@@ -151,28 +151,30 @@ while True:
                 try:
                     cur.execute("SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME) LIKE UPPER((%s)) LIMIT 1", ('%' + team + '%',))
                     stats = cur.fetchall()
-                    tstats = stats[6:10]
-                    players = stats[1:6]
-                    team = stats[0]
-                    link = stats[11]
+                    print stats
+                    tstats = stats[0][6:10]
+                    players = stats[0][1:6]
+                    team = stats[0][0]
+                    link = stats[0][10]
+                    print players
                 except:
-                    print '~~~~~~ERROR~~~~~~'
+                    print '~~~~~~ERROR1~~~~~~'
                     pass
                 try:
                     format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | Rating is under maintnance.' * 5) + (
                         statfill % (tuple(tstats))) + '\n\n**Win/Loss Percentage:** ' + str(
                             round((float(tstats[0]) / float(tstats[2])), 2))
                 except:
-                    print '~~~~~~ERROR~~~~~~'
+                    print '~~~~~~ERROR2~~~~~~'
                     pass
                 try:
                     comment.reply(
                             'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + (
-                                format_text % (players,)) + '\n\n Powered by (HLTV)[http://www.hltv.org/' + link + ']')
+                                format_text % (tuple(players))) + '\n\n [Powered by HLTV](http://www.hltv.org/' + link + ')')
                 except:
-                    print '~~~~~~ERROR~~~~~~'
+                    print '~~~~~~ERROR3~~~~~~'
                     pass
-                already_done.append(comment.id)
+                    already_done.append(comment.id)
             print "~~~~~~~~~Comment posted.~~~~~~~~~"
     conn.close()
     time.sleep(20)
