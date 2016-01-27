@@ -35,6 +35,8 @@ def pstats(plink):
     for stat in soup.find_all(style="font-weight:normal;width:100px;float:left;text-align:right;color:black"):
         if '%' in stat.get_text():
             stats += [stat.get_text().replace('%', '')]
+        elif '-' in stat.get_text():
+            stats += [stat.get_text().replace('-', '')]
         else:
             stats += [stat.get_text()]
     for stat in soup.find_all(style="font-weight:normal;width:185px;float:left;text-align:right;color:black;"):
