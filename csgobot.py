@@ -156,18 +156,21 @@ while True:
                     team = stats[0]
                     link = stats[11]
                 except:
+                    print '~~~~~~ERROR~~~~~~'
                     pass
                 try:
                     format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + ('\n%s | Rating is under maintnance.' * 5) + (
                         statfill % (tuple(tstats))) + '\n\n**Win/Loss Percentage:** ' + str(
                             round((float(tstats[0]) / float(tstats[2])), 2))
                 except:
+                    print '~~~~~~ERROR~~~~~~'
                     pass
                 try:
                     comment.reply(
                             'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + (
                                 format_text % (players,)) + '\n\n Powered by (HLTV)[http://www.hltv.org/' + link + ']')
                 except:
+                    print '~~~~~~ERROR~~~~~~'
                     pass
                 already_done.append(comment.id)
             print "~~~~~~~~~Comment posted.~~~~~~~~~"
