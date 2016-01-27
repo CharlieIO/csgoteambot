@@ -18,7 +18,6 @@ def teamlinks():
     con = urllib2.urlopen(req)
     source = con.read()
     soup = BeautifulSoup(source, 'html.parser')
-    print soup.prettify()
     for link in soup.find_all('a', href=True):
         if re.findall('pageid=179', link['href']):
             namelink[link.get_text().encode('latin1').strip()] = link.get('href').encode('latin1')
