@@ -174,7 +174,7 @@ while True:
                 except:
                     print '~~~~~~ERROR3~~~~~~'
                     pass
-                    already_done.append(comment.id)
+                already_done.append(comment.id)
             print "~~~~~~~~~Comment posted.~~~~~~~~~"
     conn.close()
     time.sleep(20)
