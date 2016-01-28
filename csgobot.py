@@ -235,7 +235,7 @@ while True:
     for comment in flat_comments:
         print comment
         has_team_call = rcall[0] in comment.body or rcall[1] in comment.body
-        has_player_call = rcall[0] in comment.body or rcall[1] in comment.body
+        has_player_call = pcall[0] in comment.body or pcall[1] in comment.body
         if comment.id not in talready_done and has_team_call:
             team = get_team(comment.body)
             statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
