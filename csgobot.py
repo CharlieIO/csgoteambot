@@ -75,7 +75,7 @@ def pstats(plink):
     for name in soup.find_all('b'):
         if name.get_text()[0] == "'":
             names += [name.get_text().strip("'")]
-    if len(names) == 4 and len(personalstats == 4) and len(stats) == 10:
+    if len(names) == 4 and len(personalstats) == 4 and len(stats) == 10:
         print '\n', names
         return personalstats[0], personalstats[1], personalstats[3], stats[0], stats[1], stats[2], stats[9], names[0], names[1], names[2], names[3]
     elif len(personalstats) == 4 and len(stats) == 10:
