@@ -281,7 +281,6 @@ while True:
 
         if comment.id not in palready_done and has_player_call:
             p = get_team(comment.body)
-            statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
             if p != '!roster' and p != '!team' and any((c in forbidden) for c in p) == -1 and forbidden2 not in p.upper():
                 try:
                     cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER LIKE (%s) LIMIT 1",
@@ -299,8 +298,7 @@ while True:
                     pass
                 try:
                     format_text = ' | ' + '\n:--:|:--:' + (
-                    '\n**Real Name:** | %s \n**Age:** | %s \n**Primary Team:** %s') + (
-                                      statfill % (tuple(personal[1:]))) + '\n\n**Kills:** ' + str(KD[0]) + '\n\n**Deaths:** ' + str(KD[1]) + '\n\n**Kill/Death Ratio:** ' + str(
+                    '\n**Real Name:** | %s \n**Age:** | %s \n**Primary Team:** %s')  + '\n\n**Kills:** ' + str(KD[0]) + '\n\n**Deaths:** ' + str(KD[1]) + '\n\n**Kill/Death Ratio:** ' + str(
                             round((float(KD[0]) / float(KD[1])), 2)) + '\n\n**HSP:** ' + str(HSRating[0]) + '\n\n**HLTV Rating:** ' + str(HSRating[1])
                 except:
                     print '~~~~~~ERROR2~~~~~~'
@@ -309,7 +307,7 @@ while True:
                     comment.reply(
                             'Information for **[' + personal[0] + '](http://www.hltv.org' + link + ')**:' + (
                                 format_text % (
-                                tuple(players))) + '\n\n [Powered by HLTV](http://www.hltv.org/' + tlink + ') \n\n [GitHub Source](https://github.com/Charrod/csgoteambot)')
+                                tuple(personal[1:]))) + '\n\n [Powered by HLTV](http://www.hltv.org/' + tlink + ') \n\n [GitHub Source](https://github.com/Charrod/csgoteambot)')
                 except:
                     print '~~~~~~ERROR3~~~~~~'
                     pass
