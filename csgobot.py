@@ -184,11 +184,13 @@ def get_team(comment):
     for num in range(len(comment)):
         if comment[num] == '!roster' or comment[num] == '!team' or comment[num] == '!player' or comment[num] == '!rektby':
             if comment[num+1][0] == '"' and comment[num+1][-1] == '"':
-                return str(comment[num][1:])
-            elif comment[num+1][0] == '"' and comment[num+2][-1] == '"' and comment[num+1][0] != '"':
-                return str(comment[num][1:] + comment[num+1][:-1])
-            elif comment[num+1][0] == '"' and '"' not in comment[num+2] and comment[num+3][-1] != '"':
-                return str(comment[num][1:] + comment[num+1][:-1])
+                return str(comment[num+1][1:-1])
+            elif comment[num+1][0] == '"' and comment[num+2][-1] == '"' and comment[num+1][-1] != '"': #if it is 2 words
+                print str(comment[num+1][1:] + ' ' + comment[num+2][:-1])
+                return str(comment[num+1][1:] + ' ' + comment[num+2][:-1])
+            elif comment[num+1][0] == '"' and '"' not in comment[num+2] and comment[num+3][-1] != '"': #if it is 3 words
+                print str(comment[num][1:] + ' ' + comment[num+2][:] + ' ' + comment[num+3][:-1])
+                return str(comment[num][1:] + ' ' + comment[num+2][:] + ' ' + comment[num+3][:-1])
 
 def show_table():
     conn = psycopg2.connect(
@@ -219,7 +221,8 @@ rcall = ['!roster', '!team']
 pcall = ['!player', '!rektby']
 talready_done = []
 palready_done = []
-forbidden = '+%\\*";[]{}:'
+forbidden = '+%\\*;[]{}:"'
+forbidden2 = 'DROP'
 while True:
     conn = psycopg2.connect(
             database=url.path[1:],
@@ -239,7 +242,7 @@ while True:
         if comment.id not in talready_done and has_team_call:
             team = get_team(comment.body)
             statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
-            if team != '!roster' and team != '!team' and any((c in forbidden) for c in team) == -1:
+            if team != '!roster' and team != '!team' and any((c in forbidden) for c in team) == -1 and forbidden2 not in team.upper():
                 try:
                     if team.upper() == 'VP':
                         team.replace('VP', 'Virtus.Pro')
@@ -279,7 +282,7 @@ while True:
         if comment.id not in palready_done and has_player_call:
             p = get_team(comment.body)
             statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
-            if p != '!roster' and p != '!team' and any((c in forbidden) for c in p) == -1:
+            if p != '!roster' and p != '!team' and any((c in forbidden) for c in p) == -1 and forbidden2 not in p.upper():
                 try:
                     cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER LIKE (%s) LIMIT 1",
                                 ('%' + p + '%',))
