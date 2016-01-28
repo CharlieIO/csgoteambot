@@ -244,21 +244,22 @@ while True:
             statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
             if team != '!roster' and team != '!team' and any((c in forbidden) for c in team) == -1 and forbidden2 not in team.upper():
                 try:
+                    print '1'
                     if team.upper() == 'VP':
                         team.replace('VP', 'Virtus.Pro')
                     cur.execute("SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME) LIKE UPPER((%s)) LIMIT 1",
                                 ('%' + team + '%',))
                     stats = cur.fetchall()
-                    print stats
+                    print '2 TEAM STATS GATHERED~~~~~~~~~~~'
                     tstats = stats[0][6:10]
                     players = stats[0][1:6]
                     team = stats[0][0]
                     link = stats[0][10]
-                    print players
                 except:
                     print '~~~~~~ERROR1~~~~~~'
                     pass
                 try:
+                    print 3
                     format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + (
                     '\n%s | Rating will be added soon.' * 5) + (
                                       statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
@@ -267,6 +268,7 @@ while True:
                     print '~~~~~~ERROR2~~~~~~'
                     pass
                 try:
+                    print '4'
                     comment.reply(
                             'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + (
                                 format_text % (
