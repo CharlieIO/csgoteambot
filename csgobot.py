@@ -323,7 +323,7 @@ while True:
                         cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
                         stats = cur.fetchall()
                     personal = stats[0][1:4] + (stats[0][9],)
-                    if personal[2] == '99':
+                    if str(personal[2]) == '99':
                         personal[2] = 'Age data not available.'
                     print personal  # Player, Name, Age, team
                     KD = stats[0][4:6]
