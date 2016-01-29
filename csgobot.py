@@ -345,7 +345,7 @@ while True:
                 try:
                     if len(stats) > 0:
                         comment.reply(
-                                'Information for **[' + personal[0] + '](http://www.hltv.org' + tlink + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+                                'Information for **[' + personal[0] + '](http://www.hltv.org' + str(tlink) + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
                         print "~~~~~~~~~Player Comment posted.~~~~~~~~~"
                 except:
                     print '~~~~~~ERROR3~~~~~~'
