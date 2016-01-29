@@ -328,6 +328,7 @@ while True:
                     cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1",
                                 (personal[-1],))
                     tlink = cur.fetchall()
+                    tlink = tlink[0][0]
                     print tlink
                 except:
                     print '~~~~~~ERROR1~~~~~~'
