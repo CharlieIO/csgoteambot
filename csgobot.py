@@ -258,6 +258,7 @@ while True:
             if team != '!roster' and team != '!team' and any(
                     (c in forbidden) for c in team) == False and forbidden2 not in team.upper():
                 try:
+                    stats = []
                     if team.upper() == 'VP':
                         team.replace('VP', 'Virtus.Pro')
                     cur.execute("SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME) LIKE UPPER((%s)) LIMIT 1",
@@ -284,20 +285,22 @@ while True:
                     print sys.exc_info()
                     pass
                 try:
-                    format_text = ('\n\nPlayer | Rating ' + '\n:--:|:--:' + ((
-                        '\n %s | %s ' * 5)) + (statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
-                            round((float(tstats[0]) / float(tstats[2])), 2)))
+                    if len(stats) > 0:
+                        format_text = ('\n\nPlayer | Rating ' + '\n:--:|:--:' + ((
+                            '\n %s | %s ' * 5)) + (statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
+                                round((float(tstats[0]) / float(tstats[2])), 2)))
                 except:
                     print '~~~~~~ERROR2~~~~~~'
                     pass
                 try:
-                    print format_text
-                    comment.reply(
-                            'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + ((
-                                                                                                                         format_text) % (
-                                                                                                                     tuple(
-                                                                                                                         unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
-                    print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
+                    if len(stats) > 0:
+                        print format_text
+                        comment.reply(
+                                'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + ((
+                                                                                                                             format_text) % (
+                                                                                                                         tuple(
+                                                                                                                             unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+                        print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
                 except:
                     print '~~~~~~ERROR3~~~~~~'
                     pass
@@ -310,6 +313,7 @@ while True:
             if p != '!roster' and p != '!team' and any(
                     (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
                 try:
+                    stats = []
                     cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER LIKE (%s) LIMIT 1",
                                 ('%' + p + '%',))
                     stats = cur.fetchall()
@@ -329,18 +333,20 @@ while True:
                     print '~~~~~~ERROR1~~~~~~'
                     pass
                 try:
-                    format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[1] + '**\nAge: | **' + \
-                                  personal[2] + '**\nPrimary Team: | **' + personal[3] + '**\nKills: | **' + str(
-                            KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
-                            round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
-                            HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
+                    if len(stats) > 0:
+                        format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[1] + '**\nAge: | **' + \
+                                      personal[2] + '**\nPrimary Team: | **' + personal[3] + '**\nKills: | **' + str(
+                                KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
+                                round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
+                                HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
                 except:
                     print '~~~~~~ERROR2~~~~~~'
                     pass
                 try:
-                    comment.reply(
-                            'Information for **[' + personal[0] + '](http://www.hltv.org)**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
-                    print "~~~~~~~~~Player Comment posted.~~~~~~~~~"
+                    if len(stats) > 0:
+                        comment.reply(
+                                'Information for **[' + personal[0] + '](http://www.hltv.org' + tlink + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+                        print "~~~~~~~~~Player Comment posted.~~~~~~~~~"
                 except:
                     print '~~~~~~ERROR3~~~~~~'
                     pass
