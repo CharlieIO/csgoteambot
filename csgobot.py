@@ -36,7 +36,7 @@ def auto_scrape():
                 time.sleep(3)
             except:
                 pass
-            # name, age, team, K, HSP, D, Rating
+                # name, age, team, K, HSP, D, Rating
         time.sleep(3)
     print 'UPDATE COMPLETE :)'
 
@@ -100,7 +100,7 @@ def tscrape(teamlink):
     soup = BeautifulSoup(source, 'html.parser')
     playerlink = {}
     for link in soup.find_all('a', href=True):
-        if re.findall('pageid=173', link['href']):
+        if link in re.findall('pageid=173', link['href']):
             if '(' in link.get_text():
                 playerlink[link.get_text().split(' (')[0]] = link.get('href')
                 players += [link.get_text().split(' (')[0]]
@@ -122,7 +122,7 @@ def player_database_update(player, name, age, team, k, d, hsp, rating, link):
         cur.execute(
                 "INSERT INTO CSGO_PLAYERS (PLAYER, IRLNAME, AGE, TEAM, KILLS, DEATHS, HSP, RATING, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (player, name, age, team, k, d, hsp, rating, link))
-        print '\nNew Player Added Successfullly'
+        print '\nNew Player Added Successfully'
     else:
         cur.execute("UPDATE CSGO_PLAYERS SET IRLNAME=(%s) WHERE PLAYER=(%s)", (name, player))
         cur.execute("UPDATE CSGO_PLAYERS SET AGE=(%s) WHERE PLAYER=(%s)", (age, player))
@@ -146,13 +146,13 @@ def team_database_update(tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, lin
             port=url.port
     )
     cur = conn.cursor()
-    cur.execute("SELECT TEAM_NAME FROM csgo_teams")
-    nameslist = cur.fetchall()
-    if (tname.encode('latin1'),) not in nameslist:
+    cur.execute("SELECT LINK FROM csgo_teams")
+    linklist = cur.fetchall()
+    if (link.encode('latin1'),) not in linklist:
         cur.execute(
                 "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, link))
-        print '\nNew Team Added Successfullly'
+        print '\nNew Team Added Successfully'
     else:
         cur.execute("UPDATE CSGO_TEAMS SET TEAM_NAME=(%s) WHERE TEAM_NAME= (%s)", (tname, tname))
         cur.execute("UPDATE CSGO_TEAMS SET PLAYER1=(%s) WHERE TEAM_NAME= (%s)", (p1, tname))
@@ -191,18 +191,21 @@ def get_team(comment):
     for num in range(len(comment)):
         if comment[num] == '!roster' or comment[num] == '!team' or comment[num] == '!player' or comment[
             num] == '!rektby':
-            if comment[num + 1][0] == '"' and comment[num + 1][-1] == '"':
-                return str(comment[num + 1][1:-1])
-            elif comment[num + 1][0] == '"' and comment[num + 2][-1] == '"' and comment[num + 1][
-                -1] != '"':  # if it is 2 words
-                print str(comment[num + 1][1:] + ' ' + comment[num + 2][:-1])
-                return str(comment[num + 1][1:] + ' ' + comment[num + 2][:-1])
-            elif comment[num + 1][0] == '"' and '"' not in comment[num + 2] and comment[num + 3][
-                -1] != '"':  # if it is 3 words
-                print str(comment[num][1:] + ' ' + comment[num + 2][:] + ' ' + comment[num + 3][:-1])
-                return str(comment[num][1:] + ' ' + comment[num + 2][:] + ' ' + comment[num + 3][:-1])
+            if comment[num + 1][0] == '"': #for multi-word teams, players.
+                if comment[num + 1][-1] == '"':
+                    if len(str(comment[num + 1][1:-1])) < 50:
+                        return str(comment[num + 1][1:-1])
+                elif comment[num + 2][-1] == '"' and comment[num + 1][-1] != '"':  # if it is 2 words
+                    if len(str(comment[num + 1][1:] + ' ' + comment[num + 2][:-1])) < 50:
+                        return str(comment[num + 1][1:] + ' ' + comment[num + 2][:-1])
+                elif '"' not in comment[num + 2] and comment[num + 3][-1] != '"':  # if it is 3 words
+                    if len(str(comment[num][1:] + ' ' + comment[num + 2][:] + ' ' + comment[num + 3][:-1])) < 50:
+                        return str(comment[num][1:] + ' ' + comment[num + 2][:] + ' ' + comment[num + 3][:-1])
+                else:
+                    return 'DROP'
             else:
-                return 'DROP'
+                if len(comment[num + 1]) < 50:
+                    return comment[num + 1]
 
 
 def show_table():
@@ -215,8 +218,9 @@ def show_table():
     )
     cur = conn.cursor()
     print 'connected'
-    cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER LIKE (%s) LIMIT 1", ('%' + 'Stewie2k' + '%',))
+    cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER LIKE (%s) LIMIT 1",('Stewie2k',))
     stats = cur.fetchall()
+    print len(stats)
     print stats
     # cur.execute("ALTER TABLE CSGO_PLAYERS ALTER COLUMN HSP SET DATA TYPE NUMERIC (3,1)")
     # rows = cur.fetchall()
@@ -226,7 +230,6 @@ def show_table():
     # conn.commit()
     print 'done'
     conn.close()
-
 
 r = praw.Reddit('An easy way to access team rosters.')
 r.login(os.environ['REDDIT_USER'], os.environ['REDDIT_PASS'])
@@ -314,10 +317,14 @@ while True:
                     (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
                 try:
                     stats = []
-                    cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER LIKE (%s) LIMIT 1",
-                                ('%' + p + '%',))
+                    cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER=(%s) LIMIT 1", (p,))
                     stats = cur.fetchall()
+                    if len(stats) == 0:
+                        cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
+                        stats = cur.fetchall()
                     personal = stats[0][1:4] + (stats[0][9],)
+                    if personal[2] == '99':
+                        personal[2] = 'Age data not available.'
                     print personal  # Player, Name, Age, team
                     KD = stats[0][4:6]
                     print KD  # Kills, Deaths
@@ -325,6 +332,7 @@ while True:
                     HSRating = stats[0][6:8]
                     print HSRating
                     link = stats[0][8]
+                    print link
                     cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1",
                                 (personal[-1],))
                     tlink = cur.fetchall()
@@ -346,7 +354,7 @@ while True:
                 try:
                     if len(stats) > 0:
                         comment.reply(
-                                'Information for **[' + personal[0] + '](http://www.hltv.org' + str(tlink) + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+                                'Information for **' + personal[0] + '**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
                         print "~~~~~~~~~Player Comment posted.~~~~~~~~~"
                 except:
                     print '~~~~~~ERROR3~~~~~~'
