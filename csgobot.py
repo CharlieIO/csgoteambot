@@ -5,6 +5,7 @@ import urllib2
 import re
 import psycopg2
 import urlparse
+import sys
 from bs4 import BeautifulSoup
 
 urlparse.uses_netloc.append("postgres")
@@ -277,6 +278,7 @@ while True:
                         unite.append(fixed_rating[num])
                 except:
                     print '~~~~~~ERROR1.~~~~~~'
+                    print sys.exc_info()
                     pass
                 try:
                     format_text = ('\n\nPlayer | Rating ' + '\n:--:|:--:' + ((
@@ -339,6 +341,6 @@ while True:
                 except:
                     print '~~~~~~ERROR3~~~~~~'
                     pass
-                talready_done.append(comment.id)
+                palready_done.append(comment.id)
     conn.close()
     time.sleep(10)
