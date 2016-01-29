@@ -66,7 +66,7 @@ def pstats(plink):
             stats += [stat.get_text()]
     for stat in soup.find_all(style="font-weight:normal;width:185px;float:left;text-align:right;color:black;"):
         if '-' == stat.get_text():
-            personalstats += [stat.get_text().replace('-', '99')] #fix for no age listed
+            personalstats += [stat.get_text().replace('-', '99')]  # fix for no age listed
         else:
             personalstats += [stat.get_text()]
     for stat in soup.find_all(
@@ -77,12 +77,15 @@ def pstats(plink):
             names += [name.get_text().strip("'")]
     if len(names) == 4 and len(personalstats) == 4 and len(stats) == 10:
         print '\n', names
-        return personalstats[0], personalstats[1], personalstats[3], stats[0], stats[1], stats[2], stats[9], names[0], names[1], names[2], names[3]
+        return personalstats[0], personalstats[1], personalstats[3], stats[0], stats[1], stats[2], stats[9], names[0], \
+               names[1], names[2], names[3]
     elif len(personalstats) == 4 and len(stats) == 10:
         print '\nIncomplete team or overloaded (>5 members)'
-        return personalstats[0], personalstats[1], personalstats[3], stats[0], stats[1], stats[2], stats[9], '', '', '', ''
+        return personalstats[0], personalstats[1], personalstats[3], stats[0], stats[1], stats[2], stats[
+            9], '', '', '', ''
     else:
         return '', '', '', '', '', '', '', '', '', '', ''
+
 
 def tscrape(teamlink):
     players = []
@@ -182,15 +185,21 @@ def statscrape(teamlink):
 def get_team(comment):
     comment = str(comment).split()
     for num in range(len(comment)):
-        if comment[num] == '!roster' or comment[num] == '!team' or comment[num] == '!player' or comment[num] == '!rektby':
-            if comment[num+1][0] == '"' and comment[num+1][-1] == '"':
-                return str(comment[num+1][1:-1])
-            elif comment[num+1][0] == '"' and comment[num+2][-1] == '"' and comment[num+1][-1] != '"': #if it is 2 words
-                print str(comment[num+1][1:] + ' ' + comment[num+2][:-1])
-                return str(comment[num+1][1:] + ' ' + comment[num+2][:-1])
-            elif comment[num+1][0] == '"' and '"' not in comment[num+2] and comment[num+3][-1] != '"': #if it is 3 words
-                print str(comment[num][1:] + ' ' + comment[num+2][:] + ' ' + comment[num+3][:-1])
-                return str(comment[num][1:] + ' ' + comment[num+2][:] + ' ' + comment[num+3][:-1])
+        if comment[num] == '!roster' or comment[num] == '!team' or comment[num] == '!player' or comment[
+            num] == '!rektby':
+            if comment[num + 1][0] == '"' and comment[num + 1][-1] == '"':
+                return str(comment[num + 1][1:-1])
+            elif comment[num + 1][0] == '"' and comment[num + 2][-1] == '"' and comment[num + 1][
+                -1] != '"':  # if it is 2 words
+                print str(comment[num + 1][1:] + ' ' + comment[num + 2][:-1])
+                return str(comment[num + 1][1:] + ' ' + comment[num + 2][:-1])
+            elif comment[num + 1][0] == '"' and '"' not in comment[num + 2] and comment[num + 3][
+                -1] != '"':  # if it is 3 words
+                print str(comment[num][1:] + ' ' + comment[num + 2][:] + ' ' + comment[num + 3][:-1])
+                return str(comment[num][1:] + ' ' + comment[num + 2][:] + ' ' + comment[num + 3][:-1])
+            else:
+                return 'DROP'
+
 
 def show_table():
     conn = psycopg2.connect(
@@ -210,7 +219,7 @@ def show_table():
     # print "\nShow me the databases:\n"
     # for row in rows:
     #     print "   ", row
-    #conn.commit()
+    # conn.commit()
     print 'done'
     conn.close()
 
@@ -241,79 +250,95 @@ while True:
         has_player_call = pcall[0] in comment.body or pcall[1] in comment.body
         if comment.id not in talready_done and has_team_call:
             team = get_team(comment.body)
-            statfill = '\n\n**Wins:** %s' + '\n\n**Draws:** %s' + '\n\n**Losses:** %s' + '\n\n**Rounds Played:**  %s'
-            if team != '!roster' and team != '!team' and any((c in forbidden) for c in team) == -1 and forbidden2 not in team.upper():
+            statfill = '\n\n**Wins:** %s' + ' \n\n**Draws:** %s' + ' \n\n**Losses:** %s' + ' \n\n**Rounds Played:**  %s '
+            if team != '!roster' and team != '!team' and any(
+                    (c in forbidden) for c in team) == False and forbidden2 not in team.upper():
                 try:
-                    print '1'
                     if team.upper() == 'VP':
                         team.replace('VP', 'Virtus.Pro')
                     cur.execute("SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME) LIKE UPPER((%s)) LIMIT 1",
                                 ('%' + team + '%',))
                     stats = cur.fetchall()
-                    print '2 TEAM STATS GATHERED~~~~~~~~~~~'
+                    unite = []
                     tstats = stats[0][6:10]
                     players = stats[0][1:6]
                     team = stats[0][0]
                     link = stats[0][10]
+                    player_ratings = []
+                    for player in players:
+                        cur.execute("SELECT RATING FROM CSGO_PLAYERS WHERE PLAYER=(%s)",
+                                    (player,))
+                        player_ratings += (cur.fetchall())[0]
+                    fixed_rating = []
+                    for rate in player_ratings:
+                        fixed_rating += [str(rate)]
+                    for num in range(5):
+                        unite.append(players[num])
+                        unite.append(fixed_rating[num])
                 except:
-                    print '~~~~~~ERROR1~~~~~~'
+                    print '~~~~~~ERROR1.~~~~~~'
                     pass
                 try:
-                    print 3
-                    format_text = '\n\nPlayer | Rating ' + '\n:--:|:--:' + (
-                    '\n%s | Rating will be added soon.' * 5) + (
-                                      statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
-                            round((float(tstats[0]) / float(tstats[2])), 2))
+                    format_text = ('\n\nPlayer | Rating ' + '\n:--:|:--:' + ((
+                        '\n %s | %s ' * 5)) + (statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
+                            round((float(tstats[0]) / float(tstats[2])), 2)))
                 except:
                     print '~~~~~~ERROR2~~~~~~'
                     pass
                 try:
-                    print '4'
+                    print format_text
                     comment.reply(
-                            'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + (
-                                format_text % (
-                                tuple(players))) + '\n\n [Powered by HLTV](http://www.hltv.org/' + link + ') \n\n [GitHub Source](https://github.com/Charrod/csgoteambot)')
+                            'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + ((
+                                                                                                                         format_text) % (
+                                                                                                                     tuple(
+                                                                                                                         unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+                    print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
                 except:
                     print '~~~~~~ERROR3~~~~~~'
                     pass
                 talready_done.append(comment.id)
-            print "~~~~~~~~~Comment posted.~~~~~~~~~"
 
-#---------------------------------------------Player called-----------------------------------------------------
+                # ---------------------------------------------Player called-----------------------------------------------------
 
         if comment.id not in palready_done and has_player_call:
             p = get_team(comment.body)
-            if p != '!roster' and p != '!team' and any((c in forbidden) for c in p) == -1 and forbidden2 not in p.upper():
+            if p != '!roster' and p != '!team' and any(
+                    (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
                 try:
                     cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER LIKE (%s) LIMIT 1",
                                 ('%' + p + '%',))
                     stats = cur.fetchall()
-                    personal = stats[0][1:4] + [stats[0][9]] #Player, Name, Age, team
-                    KD = stats[0][4:6] #Kills, Deaths
+                    personal = stats[0][1:4] + (stats[0][9],)
+                    print personal  # Player, Name, Age, team
+                    KD = stats[0][4:6]
+                    print KD  # Kills, Deaths
+
                     HSRating = stats[0][6:8]
+                    print HSRating
                     link = stats[0][8]
-                    cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE TEAM=(%s)) LIMIT 1",
-                                (personal[0],))
+                    cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1",
+                                (personal[-1],))
                     tlink = cur.fetchall()
+                    print tlink
                 except:
                     print '~~~~~~ERROR1~~~~~~'
                     pass
                 try:
-                    format_text = ' | ' + '\n:--:|:--:' + (
-                    '\n**Real Name:** | %s \n**Age:** | %s \n**Primary Team:** %s')  + '\n\n**Kills:** ' + str(KD[0]) + '\n\n**Deaths:** ' + str(KD[1]) + '\n\n**Kill/Death Ratio:** ' + str(
-                            round((float(KD[0]) / float(KD[1])), 2)) + '\n\n**HSP:** ' + str(HSRating[0]) + '\n\n**HLTV Rating:** ' + str(HSRating[1])
+                    format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[1] + '**\nAge: | **' + \
+                                  personal[2] + '**\nPrimary Team: | **' + personal[3] + '**\nKills: | **' + str(
+                            KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
+                            round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
+                            HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
                 except:
                     print '~~~~~~ERROR2~~~~~~'
                     pass
                 try:
                     comment.reply(
-                            'Information for **[' + personal[0] + '](http://www.hltv.org' + link + ')**:' + (
-                                format_text % (
-                                tuple(personal[1:]))) + '\n\n [Powered by HLTV](http://www.hltv.org/' + tlink + ') \n\n [GitHub Source](https://github.com/Charrod/csgoteambot)')
+                            'Information for **[' + personal[0] + '](http://www.hltv.org)**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+                    print "~~~~~~~~~Player Comment posted.~~~~~~~~~"
                 except:
                     print '~~~~~~ERROR3~~~~~~'
                     pass
                 talready_done.append(comment.id)
-            print "~~~~~~~~~Player Comment posted.~~~~~~~~~"
     conn.close()
-    time.sleep(20)
+    time.sleep(10)
