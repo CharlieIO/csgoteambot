@@ -5,7 +5,6 @@ import urllib2
 import re
 import psycopg2
 import urlparse
-import sys
 from bs4 import BeautifulSoup
 
 urlparse.uses_netloc.append("postgres")
@@ -15,33 +14,35 @@ url = urlparse.urlparse(os.environ["DATABASE_URL"])
 def auto_scrape():
     tcount = 0
     pcount = 0
-    teamlink = teamlinks()
+    teamlink = teamLinks()
     for tname in teamlink:
-        players_updated = False
         tlink = teamlink[tname]
-        players, playerlink = tscrape(teamlink[tname])
-        win, draw, loss, mapsplayed, kills, deaths, rounds, kdratio = statscrape(teamlink[tname])
+        players_updated = False
+        players, playerlink = tScrape(tlink)
+        win, draw, loss, mapsplayed, kills, deaths, rounds, kdratio = statScrape(tlink)
         for player in playerlink:
             plink = playerlink[player]
-            try:
-                pname, age, team, k, hsp, d, rating, p1, p2, p3, p4 = pstats(plink)
-                if not players_updated:
-                    team_database_update(team, p1, p2, p3, p4, player, win, draw, loss, rounds, tlink)
-                    players_updated = True
-                    tcount += 1
-                    print team + ' has been modified. \n' + str(tcount) + ' teams modified.'
-                player_database_update(player, pname, age, team, k, d, hsp, rating, plink)
-                pcount += 1
-                print player + ' has been modified. \n' + str(pcount) + ' players modified. #' + team
-                time.sleep(3)
-            except:
-                pass
+            p1, p2, p3, p4 = otherPlayers(plink)
+            # try:
+            if not players_updated:
+                team_database_update(tname, p1, p2, p3, p4, player, win, draw, loss, rounds, tlink)
+                players_updated = True
+                tcount += 1
+                print tname + ' has been modified. \n' + str(tcount) + ' teams modified.'
+            pname, age, team, k, hsp, d, rating, u1, u2, u3, u4 = pStats(plink)
+            player_database_update(player, pname, age, team, k, d, hsp, rating, plink)
+            pcount += 1
+            print player + ' has been modified. \n' + str(pcount) + ' players modified. #' + team
+            time.sleep(3)
+            # except:
+            #     print 'error'
+            #     pass
                 # name, age, team, K, HSP, D, Rating
         time.sleep(3)
     print 'UPDATE COMPLETE :)'
 
 
-def teamlinks():
+def teamLinks():
     namelink = {}
     req = urllib2.Request('http://www.hltv.org/?pageid=182&mapCountOverride=10', headers={
         'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"})
@@ -50,11 +51,16 @@ def teamlinks():
     soup = BeautifulSoup(source, 'html.parser')
     for link in soup.find_all('a', href=True):
         if re.findall('pageid=179', link['href']):
-            namelink[link.get_text().encode('latin1').strip()] = link.get('href').encode('latin1')
+            namelink[link.get_text().encode('latin1').strip()] = link.get('href').encode('latin1').replace('/','')
     return namelink
 
 
-def pstats(plink):
+def otherPlayers(plink):
+    u1, u2, u3, u4, u5, u6, u7, p1, p2, p3, p4 = pStats(plink)
+    return p1, p2, p3, p4
+
+
+def pStats(plink):
     req = urllib2.Request('http://www.hltv.org/' + str(plink), headers={
         'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"})
     con = urllib2.urlopen(req)
@@ -91,7 +97,7 @@ def pstats(plink):
         return '', '', '', '', '', '', '', '', '', '', ''
 
 
-def tscrape(teamlink):
+def tScrape(teamlink):
     players = []
     req = urllib2.Request('http://www.hltv.org/' + teamlink, headers={
         'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"})
@@ -100,7 +106,7 @@ def tscrape(teamlink):
     soup = BeautifulSoup(source, 'html.parser')
     playerlink = {}
     for link in soup.find_all('a', href=True):
-        if link in re.findall('pageid=173', link['href']):
+        if re.findall('pageid=173', link['href']):
             if '(' in link.get_text():
                 playerlink[link.get_text().split(' (')[0]] = link.get('href')
                 players += [link.get_text().split(' (')[0]]
@@ -118,23 +124,27 @@ def player_database_update(player, name, age, team, k, d, hsp, rating, link):
     cur = conn.cursor()
     cur.execute("SELECT LINK FROM CSGO_PLAYERS")
     linklist = cur.fetchall()
-    if (link.encode('latin1'),) not in linklist:
-        cur.execute(
-                "INSERT INTO CSGO_PLAYERS (PLAYER, IRLNAME, AGE, TEAM, KILLS, DEATHS, HSP, RATING, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (player, name, age, team, k, d, hsp, rating, link))
-        print '\nNew Player Added Successfully'
-    else:
-        cur.execute("UPDATE CSGO_PLAYERS SET IRLNAME=(%s) WHERE PLAYER=(%s)", (name, player))
-        cur.execute("UPDATE CSGO_PLAYERS SET AGE=(%s) WHERE PLAYER=(%s)", (age, player))
-        cur.execute("UPDATE CSGO_PLAYERS SET TEAM=(%s) WHERE PLAYER=(%s)", (team, player))
-        cur.execute("UPDATE CSGO_PLAYERS SET KILLS=(%s) WHERE PLAYER=(%s)", (k, player))
-        cur.execute("UPDATE CSGO_PLAYERS SET DEATHS=(%s) WHERE PLAYER=(%s)", (d, player))
-        cur.execute("UPDATE CSGO_PLAYERS SET HSP=(%s) WHERE PLAYER=(%s)", (hsp, player))
-        cur.execute("UPDATE CSGO_PLAYERS SET RATING=(%s) WHERE PLAYER=(%s)", (rating, player))
-        cur.execute("UPDATE CSGO_PLAYERS SET LINK=(%s) WHERE PLAYER=(%s)", (link, player))
-        print '\nExisting Player Updated'
-    conn.commit()
-    conn.close()
+    try:
+        if (link.encode('latin1'),) not in linklist:
+            cur.execute(
+                    "INSERT INTO CSGO_PLAYERS (PLAYER, IRLNAME, AGE, TEAM, KILLS, DEATHS, HSP, RATING, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (player, name, age, team, k, d, hsp, rating, link))
+            print '\nNew Player Added Successfully'
+        else:
+            cur.execute("UPDATE CSGO_PLAYERS SET IRLNAME=(%s) WHERE PLAYER=(%s)", (name, player))
+            cur.execute("UPDATE CSGO_PLAYERS SET AGE=(%s) WHERE PLAYER=(%s)", (age, player))
+            cur.execute("UPDATE CSGO_PLAYERS SET TEAM=(%s) WHERE PLAYER=(%s)", (team, player))
+            cur.execute("UPDATE CSGO_PLAYERS SET KILLS=(%s) WHERE PLAYER=(%s)", (k, player))
+            cur.execute("UPDATE CSGO_PLAYERS SET DEATHS=(%s) WHERE PLAYER=(%s)", (d, player))
+            cur.execute("UPDATE CSGO_PLAYERS SET HSP=(%s) WHERE PLAYER=(%s)", (hsp, player))
+            cur.execute("UPDATE CSGO_PLAYERS SET RATING=(%s) WHERE PLAYER=(%s)", (rating, player))
+            cur.execute("UPDATE CSGO_PLAYERS SET LINK=(%s) WHERE PLAYER=(%s)", (link, player))
+            print '\nExisting Player Updated'
+        conn.commit()
+        conn.close()
+    except:
+        conn.close()
+        pass
 
 
 def team_database_update(tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, link):
@@ -170,7 +180,7 @@ def team_database_update(tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, lin
     conn.close()
 
 
-def statscrape(teamlink):
+def statScrape(teamlink):
     req = urllib2.Request('http://www.hltv.org/' + teamlink, headers={
         'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"})
     con = urllib2.urlopen(req)
@@ -181,6 +191,7 @@ def statscrape(teamlink):
         windrawloss = stat.get_text().split(' / ')
     for stat in soup.find_all(style="font-weight:normal;width:180px;float:left;color:black;text-align:right;"):
         otherstats += [stat.get_text()]
+    print 'statscrapegood'
     return windrawloss[0], windrawloss[1], windrawloss[2], otherstats[0], otherstats[1], otherstats[2], otherstats[3], \
            otherstats[4]  # win, draw, loss
     # other stats are maps played, total kills, total deaths, rounds played, K/D ratio
@@ -191,7 +202,7 @@ def get_team(comment):
     for num in range(len(comment)):
         if comment[num] == '!roster' or comment[num] == '!team' or comment[num] == '!player' or comment[
             num] == '!rektby':
-            if comment[num + 1][0] == '"': #for multi-word teams, players.
+            if comment[num + 1][0] == '"':  # for multi-word teams, players.
                 if comment[num + 1][-1] == '"':
                     if len(str(comment[num + 1][1:-1])) < 50:
                         return str(comment[num + 1][1:-1])
@@ -218,7 +229,7 @@ def show_table():
     )
     cur = conn.cursor()
     print 'connected'
-    cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER LIKE (%s) LIMIT 1",('Stewie2k',))
+    cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER LIKE (%s) LIMIT 1", ('rob_wiz',))
     stats = cur.fetchall()
     print len(stats)
     print stats
@@ -231,134 +242,147 @@ def show_table():
     print 'done'
     conn.close()
 
-r = praw.Reddit('An easy way to access team rosters.')
-r.login(os.environ['REDDIT_USER'], os.environ['REDDIT_PASS'])
-rcall = ['!roster', '!team']
-pcall = ['!player', '!rektby']
-talready_done = []
-palready_done = []
-forbidden = '+%\\*;[]{}:"'
-forbidden2 = 'DROP'
-while True:
-    conn = psycopg2.connect(
-            database=url.path[1:],
-            user=url.username,
-            password=url.password,
-            host=url.hostname,
-            port=url.port
-    )
-    cur = conn.cursor()
-    subreddit = r.get_subreddit('globaloffensive')
-    comments = subreddit.get_comments()
-    flat_comments = praw.helpers.flatten_tree(comments)
-    for comment in flat_comments:
-        print comment
-        has_team_call = rcall[0] in comment.body or rcall[1] in comment.body
-        has_player_call = pcall[0] in comment.body or pcall[1] in comment.body
-        if comment.id not in talready_done and has_team_call:
-            team = get_team(comment.body)
-            statfill = '\n\n**Wins:** %s' + ' \n\n**Draws:** %s' + ' \n\n**Losses:** %s' + ' \n\n**Rounds Played:**  %s '
-            if team != '!roster' and team != '!team' and any(
-                    (c in forbidden) for c in team) == False and forbidden2 not in team.upper():
-                try:
-                    stats = []
-                    if team.upper() == 'VP':
-                        team.replace('VP', 'Virtus.Pro')
-                    cur.execute("SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME) LIKE UPPER((%s)) LIMIT 1",
-                                ('%' + team + '%',))
-                    stats = cur.fetchall()
-                    unite = []
-                    tstats = stats[0][6:10]
-                    players = stats[0][1:6]
-                    team = stats[0][0]
-                    link = stats[0][10]
-                    player_ratings = []
-                    for player in players:
-                        cur.execute("SELECT RATING FROM CSGO_PLAYERS WHERE PLAYER=(%s)",
-                                    (player,))
-                        player_ratings += (cur.fetchall())[0]
-                    fixed_rating = []
-                    for rate in player_ratings:
-                        fixed_rating += [str(rate)]
-                    for num in range(5):
-                        unite.append(players[num])
-                        unite.append(fixed_rating[num])
-                except:
-                    print '~~~~~~ERROR1.~~~~~~'
-                    print sys.exc_info()
-                    pass
-                try:
-                    if len(stats) > 0:
-                        format_text = ('\n\nPlayer | Rating ' + '\n:--:|:--:' + ((
-                            '\n %s | %s ' * 5)) + (statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
-                                round((float(tstats[0]) / float(tstats[2])), 2)))
-                except:
-                    print '~~~~~~ERROR2~~~~~~'
-                    pass
-                try:
-                    if len(stats) > 0:
-                        print format_text
-                        comment.reply(
-                                'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + ((
-                                                                                                                             format_text) % (
-                                                                                                                         tuple(
-                                                                                                                             unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
-                        print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
-                except:
-                    print '~~~~~~ERROR3~~~~~~'
-                    pass
-                talready_done.append(comment.id)
-
-                # ---------------------------------------------Player called-----------------------------------------------------
-
-        if comment.id not in palready_done and has_player_call:
-            p = get_team(comment.body)
-            if p != '!roster' and p != '!team' and any(
-                    (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
-                try:
-                    stats = []
-                    cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER=(%s) LIMIT 1", (p,))
-                    stats = cur.fetchall()
-                    if len(stats) == 0:
-                        cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
-                        stats = cur.fetchall()
-                    personal = stats[0][1:4] + (stats[0][9],)
-                    if str(personal[2]) == '99':
-                        personal[2] = 'Age data not available.'
-                    print personal  # Player, Name, Age, team
-                    KD = stats[0][4:6]
-                    print KD  # Kills, Deaths
-
-                    HSRating = stats[0][6:8]
-                    print HSRating
-                    link = stats[0][8]
-                    print link
-                    cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1",
-                                (personal[-1],))
-                    tlink = cur.fetchall()
-                    tlink = tlink[0][0]
-                    print tlink
-                except:
-                    print '~~~~~~ERROR1~~~~~~'
-                    pass
-                try:
-                    if len(stats) > 0:
-                        format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[1] + '**\nAge: | **' + \
-                                      personal[2] + '**\nPrimary Team: | **' + personal[3] + '**\nKills: | **' + str(
-                                KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
-                                round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
-                                HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
-                except:
-                    print '~~~~~~ERROR2~~~~~~'
-                    pass
-                try:
-                    if len(stats) > 0:
-                        comment.reply(
-                                'Information for **' + personal[0] + '**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
-                        print "~~~~~~~~~Player Comment posted.~~~~~~~~~"
-                except:
-                    print '~~~~~~ERROR3~~~~~~'
-                    pass
-                palready_done.append(comment.id)
-    conn.close()
-    time.sleep(10)
+auto_scrape()
+time.sleep(9999999999)
+# r = praw.Reddit('An easy way to access team rosters.')
+# r.login(os.environ['REDDIT_USER'], os.environ['REDDIT_PASS'])
+# rcall = ['!roster', '!team']
+# pcall = ['!player', '!rektby']
+# talready_done = []
+# palready_done = []
+# forbidden = '+%\\*;[]{}:"'
+# forbidden2 = 'DROP'
+# while True:
+#     conn = psycopg2.connect(
+#             database=url.path[1:],
+#             user=url.username,
+#             password=url.password,
+#             host=url.hostname,
+#             port=url.port
+#     )
+#     cur = conn.cursor()
+#     subreddit = r.get_subreddit('globaloffensive')
+#     comments = subreddit.get_comments()
+#     flat_comments = praw.helpers.flatten_tree(comments)
+#     for comment in flat_comments:
+#         print comment
+#         has_team_call = rcall[0] in comment.body or rcall[1] in comment.body
+#         has_player_call = pcall[0] in comment.body or pcall[1] in comment.body
+#         if comment.id not in talready_done and has_team_call:
+#             team = get_team(comment.body)
+#             statfill = '\n\n**Wins:** %s' + ' \n\n**Draws:** %s' + ' \n\n**Losses:** %s' + ' \n\n**Rounds Played:**  %s '
+#             if team != '!roster' and team != '!team' and any(
+#                     (c in forbidden) for c in team) == False and forbidden2 not in team.upper():
+#                 try:
+#                     stats = []
+#                     if team.upper() == 'VP':
+#                         team.replace('VP', 'Virtus.Pro')
+#                     cur.execute("SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME) LIKE UPPER((%s)) LIMIT 1",
+#                                 ('%' + team + '%',))
+#                     stats = cur.fetchall()
+#                     unite = []
+#                     tstats = stats[0][6:10]
+#                     players = stats[0][1:6]
+#                     team = stats[0][0]
+#                     link = stats[0][10]
+#                     player_ratings = []
+#                     for player in players:
+#                         cur.execute("SELECT RATING FROM CSGO_PLAYERS WHERE PLAYER=(%s)",
+#                                     (player,))
+#                         player_ratings += (cur.fetchall())[0]
+#                     fixed_rating = []
+#                     for rate in player_ratings:
+#                         fixed_rating += [str(rate)]
+#                     for num in range(5):
+#                         unite.append(players[num])
+#                         unite.append(fixed_rating[num])
+#                 except:
+#                     print '~~~~~~ERROR1.~~~~~~'
+#                     print sys.exc_info()
+#                     pass
+#                 try:
+#                     if len(stats) > 0:
+#                         format_text = ('\n\nPlayer | Rating ' + '\n:--:|:--:' + ((
+#                             '\n %s | %s ' * 5)) + (statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
+#                                 round((float(tstats[0]) / float(tstats[2])), 2)))
+#                 except:
+#                     print '~~~~~~ERROR2~~~~~~'
+#                     pass
+#                 try:
+#                     if len(stats) > 0:
+#                         print format_text
+#                         comment.reply(
+#                                 'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + ((
+#                                                                                                                              format_text) % (
+#                                                                                                                          tuple(
+#                                                                                                                              unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+#                         print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
+#                 except:
+#                     print '~~~~~~ERROR3~~~~~~'
+#                     pass
+#                 unite = []
+#                 tstats = []
+#                 players = []
+#                 team = []
+#                 link = []
+#                 player_ratings = []
+#                 talready_done.append(comment.id)
+#                 time.sleep(3)
+#
+#                 # ---------------------------------------------Player called-----------------------------------------------------
+#
+#         if comment.id not in palready_done and has_player_call:
+#             p = get_team(comment.body)
+#             if p != '!roster' and p != '!team' and any(
+#                     (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
+#                 try:
+#                     stats = []
+#                     cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER=(%s) LIMIT 1", (p,))
+#                     stats = cur.fetchall()
+#                     if len(stats) == 0:
+#                         cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
+#                         stats = cur.fetchall()
+#                     personal = stats[0][1:4] + (stats[0][9],)
+#                     if str(personal[2]) == '99':
+#                         personal[2] = 'Age data not available.'
+#                     print personal  # Player, Name, Age, team
+#                     KD = stats[0][4:6]
+#                     print KD  # Kills, Deaths
+#
+#                     HSRating = stats[0][6:8]
+#                     print HSRating
+#                     link = stats[0][8]
+#                     print link
+#                     cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1",
+#                                 (personal[-1],))
+#                     tlink = cur.fetchall()
+#                     tlink = tlink[0][0]
+#                     print tlink
+#                 except:
+#                     print '~~~~~~ERROR1~~~~~~'
+#                     pass
+#                 try:
+#                     if len(stats) > 0:
+#                         format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[1] + '**\nAge: | **' + \
+#                                       personal[2] + '**\nPrimary Team: | **' + personal[3] + '**\nKills: | **' + str(
+#                                 KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
+#                                 round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
+#                                 HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
+#                 except:
+#                     print '~~~~~~ERROR2~~~~~~'
+#                     pass
+#                 try:
+#                     if len(stats) > 0:
+#                         comment.reply(
+#                                 'Information for **' + personal[0] + '**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+#                         print "~~~~~~~~~Player Comment posted.~~~~~~~~~"
+#                 except:
+#                     print '~~~~~~ERROR3~~~~~~'
+#                     pass
+#                 stats = []
+#                 KD = []
+#                 HSRating = []
+#                 link = []
+#                 palready_done.append(comment.id)
+#     conn.close()
+#     time.sleep(10)
