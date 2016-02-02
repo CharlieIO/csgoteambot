@@ -17,19 +17,20 @@ def auto_scrape():
     teamlink = teamLinks()
     for tname in teamlink:
         tlink = teamlink[tname]
-        players_updated = False
         players, playerlink = tScrape(tlink)
         win, draw, loss, mapsplayed, kills, deaths, rounds, kdratio = statScrape(tlink)
         for player in playerlink:
-            plink = playerlink[player]
-            p1, p2, p3, p4 = otherPlayers(plink)
             try:
-                if not players_updated:
-                    team_database_update(tname, p1, p2, p3, p4, player, win, draw, loss, rounds, tlink)
-                    players_updated = True
-                    tcount += 1
-                    print tname + ' has been modified. \n' + str(tcount) + ' teams modified.'
+                plink = playerlink[player]
+                p1, p2, p3, p4 = otherPlayers(plink)
+                tcount += 1
                 pname, age, team, k, hsp, d, rating, u1, u2, u3, u4 = pStats(plink)
+                if tname == team:
+                    team_database_update(tname, p1, p2, p3, p4, player, win, draw, loss, rounds, tlink)
+                    print tname + ' has been modified. \n' + str(tcount) + ' teams modified.'
+                else:
+                    team_database_update_nolink(team, p1, p2, p3, p4, player, win, draw, loss, rounds)
+                    print team + ' has been modified. \n' + str(tcount) + ' teams modified.'
                 player_database_update(player, pname, age, team, k, d, hsp, rating, plink)
                 pcount += 1
                 print player + ' has been modified. \n' + str(pcount) + ' players modified. #' + team
@@ -138,7 +139,7 @@ def player_database_update(player, name, age, team, k, d, hsp, rating, link):
             cur.execute("UPDATE CSGO_PLAYERS SET DEATHS=(%s) WHERE LINK=(%s)", (d, link))
             cur.execute("UPDATE CSGO_PLAYERS SET HSP=(%s) WHERE LINK=(%s)", (hsp, link))
             cur.execute("UPDATE CSGO_PLAYERS SET RATING=(%s) WHERE LINK=(%s)", (rating, link))
-            cur.execute("UPDATE CSGO_PLAYERS SET LINK=(%s) WHERE LINK=(%s)", (link, link))
+            #cur.execute("UPDATE CSGO_PLAYERS SET LINK=(%s) WHERE LINK=(%s)", (link, link))
             print '\nExisting Player Updated'
         conn.commit()
         conn.close()
@@ -174,10 +175,42 @@ def team_database_update(tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, lin
         cur.execute("UPDATE CSGO_TEAMS SET DRAWS=(%s) WHERE LINK= (%s)", (draw, link))
         cur.execute("UPDATE CSGO_TEAMS SET LOSSES=(%s) WHERE LINK= (%s)", (loss, link))
         cur.execute("UPDATE CSGO_TEAMS SET ROUNDS=(%s) WHERE LINK= (%s)", (rounds, link))
-        cur.execute("UPDATE CSGO_TEAMS SET LINK=(%s) WHERE LINK= (%s)", (link, link))
+        #cur.execute("UPDATE CSGO_TEAMS SET LINK=(%s) WHERE LINK= (%s)", (link, link))
         print '\nExisting Team Updated'
     conn.commit()
     conn.close()
+
+def team_database_update_nolink(tname, p1, p2, p3, p4, p5, win, draw, loss, rounds):
+    conn = psycopg2.connect(
+            database=url.path[1:],
+            user=url.username,
+            password=url.password,
+            host=url.hostname,
+            port=url.port
+    )
+    cur = conn.cursor()
+    cur.execute("SELECT TEAM_NAME FROM csgo_teams")
+    teamnames = cur.fetchall()
+    if (tname.encode('latin1'),) not in teamnames:
+        cur.execute(
+                "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (tname, p1, p2, p3, p4, p5, win, draw, loss, rounds))
+        print '\nNew Team Added Successfully'
+    else:
+        #cur.execute("UPDATE CSGO_TEAMS SET TEAM_NAME=(%s) WHERE TEAM_NAME= (%s)", (tname, tname))
+        cur.execute("UPDATE CSGO_TEAMS SET PLAYER1=(%s) WHERE TEAM_NAME= (%s)", (p1, tname))
+        cur.execute("UPDATE CSGO_TEAMS SET PLAYER2=(%s) WHERE TEAM_NAME= (%s)", (p2, tname))
+        cur.execute("UPDATE CSGO_TEAMS SET PLAYER3=(%s) WHERE TEAM_NAME= (%s)", (p3, tname))
+        cur.execute("UPDATE CSGO_TEAMS SET PLAYER4=(%s) WHERE TEAM_NAME= (%s)", (p4, tname))
+        cur.execute("UPDATE CSGO_TEAMS SET PLAYER5=(%s) WHERE TEAM_NAME= (%s)", (p5, tname))
+        cur.execute("UPDATE CSGO_TEAMS SET WINS=(%s) WHERE TEAM_NAME= (%s)", (win, tname))
+        cur.execute("UPDATE CSGO_TEAMS SET DRAWS=(%s) WHERE TEAM_NAME= (%s)", (draw, tname))
+        cur.execute("UPDATE CSGO_TEAMS SET LOSSES=(%s) WHERE TEAM_NAME= (%s)", (loss, tname))
+        cur.execute("UPDATE CSGO_TEAMS SET ROUNDS=(%s) WHERE TEAM_NAME= (%s)", (rounds, tname))
+        print '\nExisting Team Updated'
+    conn.commit()
+    conn.close()
+
 
 
 def statScrape(teamlink):
@@ -191,7 +224,6 @@ def statScrape(teamlink):
         windrawloss = stat.get_text().split(' / ')
     for stat in soup.find_all(style="font-weight:normal;width:180px;float:left;color:black;text-align:right;"):
         otherstats += [stat.get_text()]
-    print 'statscrapegood'
     return windrawloss[0], windrawloss[1], windrawloss[2], otherstats[0], otherstats[1], otherstats[2], otherstats[3], \
            otherstats[4]  # win, draw, loss
     # other stats are maps played, total kills, total deaths, rounds played, K/D ratio
