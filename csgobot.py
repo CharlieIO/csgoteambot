@@ -304,32 +304,35 @@ while True:
             statfill = '\n\n**Wins:** %s' + ' \n\n**Draws:** %s' + ' \n\n**Losses:** %s' + ' \n\n**Rounds Played:**  %s '
             if team != '!roster' and team != '!team' and any(
                     (c in forbidden) for c in team) == False and forbidden2 not in team.upper():
+                stats = []
                 try:
                     stats = []
                     if team.upper() == 'VP':
                         team.replace('VP', 'Virtus.Pro')
-                    cur.execute("SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME) LIKE UPPER((%s)) LIMIT 1",
-                                ('%' + team + '%',))
+                    cur.execute("SELECT * FROM CSGO_TEAMS WHERE TEAM_NAME=(%s) LIMIT 1", (team,))
                     stats = cur.fetchall()
-                    unite = []
-                    tstats = stats[0][6:10]
-                    players = stats[0][1:6]
-                    team = stats[0][0]
-                    link = stats[0][10]
-                    player_ratings = []
-                    for player in players:
-                        cur.execute("SELECT RATING FROM CSGO_PLAYERS WHERE PLAYER=(%s)",
-                                    (player,))
-                        player_ratings += (cur.fetchall())[0]
-                    fixed_rating = []
-                    for rate in player_ratings:
-                        fixed_rating += [str(rate)]
-                    for num in range(5):
-                        unite.append(players[num])
-                        unite.append(fixed_rating[num])
+                    if len(stats) == 0:
+                        cur.execute("SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1", (team,))
+                        stats = cur.fetchall()
+                    if len(stats) > 0:
+                        unite = []
+                        tstats = stats[0][6:10]
+                        players = stats[0][1:6]
+                        team = stats[0][0]
+                        link = stats[0][10]
+                        player_ratings = []
+                        for player in players:
+                            cur.execute("SELECT RATING FROM CSGO_PLAYERS WHERE PLAYER=(%s)",
+                                        (player,))
+                            player_ratings += (cur.fetchall())[0]
+                        fixed_rating = []
+                        for rate in player_ratings:
+                            fixed_rating += [str(rate)]
+                        for num in range(5):
+                            unite.append(players[num])
+                            unite.append(fixed_rating[num])
                 except:
                     print '~~~~~~ERROR1.~~~~~~'
-                    print sys.exc_info()
                     pass
                 try:
                     if len(stats) > 0:
@@ -374,27 +377,27 @@ while True:
                     if len(stats) == 0:
                         cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
                         stats = cur.fetchall()
-                    personal = stats[0][1:4] + (stats[0][9],)
-                    if str(personal[2]) == '99':
-                        personal = personal[0:2] + ('Age data not available.',) + personal[3:]
-                    print personal  # Player, Name, Age, team
-                    KD = stats[0][4:6]
-                    print KD  # Kills, Deaths
+                    if len(stats) > 0:
+                        personal = stats[0][1:4] + (stats[0][9],)
+                        if str(personal[2]) == '99':
+                            personal = personal[0:2] + ('Age data not available.',) + personal[3:]
+                        print personal  # Player, Name, Age, team
+                        KD = stats[0][4:6]
+                        print KD  # Kills, Deaths
 
-                    HSRating = stats[0][6:8]
-                    print HSRating
-                    link = stats[0][8]
-                    print link
-                    cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1",
-                                (personal[-1],))
-                    tlink = cur.fetchall()
-                    tlink = tlink[0][0]
-                    print tlink
+                        HSRating = stats[0][6:8]
+                        print HSRating
+                        link = stats[0][8]
+                        print link
+                        cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1",
+                                    (personal[-1],))
+                        tlink = cur.fetchall()
+                        tlink = tlink[0][0]
+                        print tlink
                 except:
                     print '~~~~~~ERROR1~~~~~~'
                     pass
                 try:
-                    HSRating[0]
                     if len(stats) > 0:
                         format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[1] + '**\nAge: | **' + \
                                       personal[2] + '**\nPrimary Team: | **' + personal[3] + '**\nKills: | **' + str(
