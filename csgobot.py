@@ -343,7 +343,7 @@ while True:
                         print format_text
                         comment.reply(
                             'Information for **[' + team.replace('&nbsp;', '').replace('%20',
-                                                                                       ' ').upper() + '](' + link + ')**:' + (
+                                                                                       ' ').upper() + '](http://hltv.org/' + link + ')**:' + (
                                 (
                                     format_text) % (
                                     tuple(
