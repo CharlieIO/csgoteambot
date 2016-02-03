@@ -52,7 +52,7 @@ def teamLinks():
     soup = BeautifulSoup(source, 'html.parser')
     for link in soup.find_all('a', href=True):
         if re.findall('pageid=179', link['href']):
-            namelink[link.get_text().encode('latin1').strip()] = link.get('href').encode('latin1').replace('/','')
+            namelink[link.get_text().encode('latin1').strip()] = link.get('href').encode('latin1').replace('/', '')
     return namelink
 
 
@@ -116,11 +116,11 @@ def tScrape(teamlink):
 
 def player_database_update(player, name, age, team, k, d, hsp, rating, link):
     conn = psycopg2.connect(
-            database=url.path[1:],
-            user=url.username,
-            password=url.password,
-            host=url.hostname,
-            port=url.port
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
     )
     cur = conn.cursor()
     cur.execute("SELECT LINK FROM CSGO_PLAYERS")
@@ -128,8 +128,8 @@ def player_database_update(player, name, age, team, k, d, hsp, rating, link):
     try:
         if (link.encode('latin1'),) not in linklist:
             cur.execute(
-                    "INSERT INTO CSGO_PLAYERS (PLAYER, IRLNAME, AGE, TEAM, KILLS, DEATHS, HSP, RATING, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                    (player, name, age, team, k, d, hsp, rating, link))
+                "INSERT INTO CSGO_PLAYERS (PLAYER, IRLNAME, AGE, TEAM, KILLS, DEATHS, HSP, RATING, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (player, name, age, team, k, d, hsp, rating, link))
             print '\nNew Player Added Successfully'
         else:
             cur.execute("UPDATE CSGO_PLAYERS SET IRLNAME=(%s) WHERE LINK=(%s)", (name, link))
@@ -139,7 +139,7 @@ def player_database_update(player, name, age, team, k, d, hsp, rating, link):
             cur.execute("UPDATE CSGO_PLAYERS SET DEATHS=(%s) WHERE LINK=(%s)", (d, link))
             cur.execute("UPDATE CSGO_PLAYERS SET HSP=(%s) WHERE LINK=(%s)", (hsp, link))
             cur.execute("UPDATE CSGO_PLAYERS SET RATING=(%s) WHERE LINK=(%s)", (rating, link))
-            #cur.execute("UPDATE CSGO_PLAYERS SET LINK=(%s) WHERE LINK=(%s)", (link, link))
+            # cur.execute("UPDATE CSGO_PLAYERS SET LINK=(%s) WHERE LINK=(%s)", (link, link))
             print '\nExisting Player Updated'
         conn.commit()
         conn.close()
@@ -150,19 +150,19 @@ def player_database_update(player, name, age, team, k, d, hsp, rating, link):
 
 def team_database_update(tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, link):
     conn = psycopg2.connect(
-            database=url.path[1:],
-            user=url.username,
-            password=url.password,
-            host=url.hostname,
-            port=url.port
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
     )
     cur = conn.cursor()
     cur.execute("SELECT LINK FROM csgo_teams")
     linklist = cur.fetchall()
     if (link.encode('latin1'),) not in linklist:
         cur.execute(
-                "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, link))
+            "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, link))
         print '\nNew Team Added Successfully'
     else:
         cur.execute("UPDATE CSGO_TEAMS SET TEAM_NAME=(%s) WHERE LINK= (%s)", (tname, link))
@@ -175,29 +175,30 @@ def team_database_update(tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, lin
         cur.execute("UPDATE CSGO_TEAMS SET DRAWS=(%s) WHERE LINK= (%s)", (draw, link))
         cur.execute("UPDATE CSGO_TEAMS SET LOSSES=(%s) WHERE LINK= (%s)", (loss, link))
         cur.execute("UPDATE CSGO_TEAMS SET ROUNDS=(%s) WHERE LINK= (%s)", (rounds, link))
-        #cur.execute("UPDATE CSGO_TEAMS SET LINK=(%s) WHERE LINK= (%s)", (link, link))
+        # cur.execute("UPDATE CSGO_TEAMS SET LINK=(%s) WHERE LINK= (%s)", (link, link))
         print '\nExisting Team Updated'
     conn.commit()
     conn.close()
 
+
 def team_database_update_nolink(tname, p1, p2, p3, p4, p5):
     conn = psycopg2.connect(
-            database=url.path[1:],
-            user=url.username,
-            password=url.password,
-            host=url.hostname,
-            port=url.port
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
     )
     cur = conn.cursor()
     cur.execute("SELECT TEAM_NAME FROM csgo_teams")
     teamnames = cur.fetchall()
     if (tname.encode('latin1'),) not in teamnames:
         cur.execute(
-                "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS) VALUES (%s, %s, %s, %s, %s, %s)",
-                (tname, p1, p2, p3, p4, p5))
+            "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS) VALUES (%s, %s, %s, %s, %s, %s)",
+            (tname, p1, p2, p3, p4, p5))
         print '\nNew Team Added Successfully'
     else:
-        #cur.execute("UPDATE CSGO_TEAMS SET TEAM_NAME=(%s) WHERE TEAM_NAME= (%s)", (tname, tname))
+        # cur.execute("UPDATE CSGO_TEAMS SET TEAM_NAME=(%s) WHERE TEAM_NAME= (%s)", (tname, tname))
         cur.execute("UPDATE CSGO_TEAMS SET PLAYER1=(%s) WHERE TEAM_NAME= (%s)", (p1, tname))
         cur.execute("UPDATE CSGO_TEAMS SET PLAYER2=(%s) WHERE TEAM_NAME= (%s)", (p2, tname))
         cur.execute("UPDATE CSGO_TEAMS SET PLAYER3=(%s) WHERE TEAM_NAME= (%s)", (p3, tname))
@@ -206,7 +207,6 @@ def team_database_update_nolink(tname, p1, p2, p3, p4, p5):
         print '\nExisting Team Updated'
     conn.commit()
     conn.close()
-
 
 
 def statScrape(teamlink):
@@ -249,11 +249,11 @@ def get_team(comment):
 
 def show_table():
     conn = psycopg2.connect(
-            database=url.path[1:],
-            user=url.username,
-            password=url.password,
-            host=url.hostname,
-            port=url.port
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
     )
     cur = conn.cursor()
     print 'connected'
@@ -281,11 +281,11 @@ forbidden = '+%\\*;[]{}:"'
 forbidden2 = 'DROP'
 while True:
     conn = psycopg2.connect(
-            database=url.path[1:],
-            user=url.username,
-            password=url.password,
-            host=url.hostname,
-            port=url.port
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
     )
     cur = conn.cursor()
     subreddit = r.get_subreddit('globaloffensive')
@@ -334,7 +334,7 @@ while True:
                     if len(stats) > 0:
                         format_text = ('\n\nPlayer | Rating ' + '\n:--:|:--:' + ((
                             '\n %s | %s ' * 5)) + (statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
-                                round((float(tstats[0]) / float(tstats[2])), 2)))
+                            round((float(tstats[0]) / float(tstats[2])), 2)))
                 except:
                     print '~~~~~~ERROR2~~~~~~'
                     pass
@@ -342,10 +342,12 @@ while True:
                     if len(stats) > 0:
                         print format_text
                         comment.reply(
-                                'Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + ((
-                                                                                                                             format_text) % (
-                                                                                                                         tuple(
-                                                                                                                             unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+                            'Information for **[' + team.replace('&nbsp;', '').replace('%20',
+                                                                                       ' ').upper() + '](' + link + ')**:' + (
+                                (
+                                    format_text) % (
+                                    tuple(
+                                        unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
                         print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
                 except:
                     print '~~~~~~ERROR3~~~~~~'
@@ -395,18 +397,20 @@ while True:
                     pass
                 try:
                     if len(stats) > 0:
-                        format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[1] + '**\nAge: | **' + \
+                        format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[
+                            1] + '**\nAge: | **' + \
                                       personal[2] + '**\nPrimary Team: | **' + personal[3] + '**\nKills: | **' + str(
-                                KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
-                                round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
-                                HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
+                            KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
+                            round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
+                            HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
                 except:
                     print '~~~~~~ERROR2~~~~~~'
                     pass
                 try:
                     if len(stats) > 0:
                         comment.reply(
-                                'Information for **' + personal[0] + '**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+                            'Information for **[' + personal[
+                                0] + '](http://www.hltv.org/' + link + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
                         print "~~~~~~~~~Player Comment posted.~~~~~~~~~"
                 except:
                     print '~~~~~~ERROR3~~~~~~'
