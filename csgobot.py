@@ -366,6 +366,7 @@ while True:
             p = get_team(comment.body)
             if p != '!roster' and p != '!team' and any(
                     (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
+                stats = []
                 try:
                     stats = []
                     cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER=(%s) LIMIT 1", (p,))
@@ -375,7 +376,7 @@ while True:
                         stats = cur.fetchall()
                     personal = stats[0][1:4] + (stats[0][9],)
                     if str(personal[2]) == '99':
-                        personal[2] = 'Age data not available.'
+                        personal = personal[0:2] + ('Age data not available.',) + personal[3:]
                     print personal  # Player, Name, Age, team
                     KD = stats[0][4:6]
                     print KD  # Kills, Deaths
@@ -393,6 +394,7 @@ while True:
                     print '~~~~~~ERROR1~~~~~~'
                     pass
                 try:
+                    HSRating[0]
                     if len(stats) > 0:
                         format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[1] + '**\nAge: | **' + \
                                       personal[2] + '**\nPrimary Team: | **' + personal[3] + '**\nKills: | **' + str(
