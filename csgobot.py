@@ -340,15 +340,26 @@ while True:
                     pass
                 try:
                     if len(stats) > 0:
-                        print format_text
-                        comment.reply(
-                            'Information for **[' + team.replace('&nbsp;', '').replace('%20',
-                                                                                       ' ').upper() + '](http://hltv.org/' + link + ')**:' + (
-                                (
-                                    format_text) % (
-                                    tuple(
-                                        unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
-                        print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
+                        if link:
+                            print format_text
+                            comment.reply(
+                                'Information for **[' + team.replace('&nbsp;', '').replace('%20',
+                                                                                           ' ').upper() + '](http://hltv.org/' + link + ')**:' + (
+                                    (
+                                        format_text) % (
+                                        tuple(
+                                            unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+                            print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
+                        else:
+                            print format_text
+                            comment.reply(
+                                'Information for **' + team.replace('&nbsp;', '').replace('%20',
+                                                                                           ' ').upper() + '**:' + (
+                                    (
+                                        format_text) % (
+                                        tuple(
+                                            unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)')
+                            print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
                 except:
                     print '~~~~~~ERROR3~~~~~~'
                     pass
