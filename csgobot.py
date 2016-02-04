@@ -380,12 +380,15 @@ while True:
                     (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
                 stats = []
                 try:
-                    stats = []
-                    cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER=(%s) LIMIT 1", (p,))
-                    stats = cur.fetchall()
-                    if len(stats) == 0:
-                        cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
+                    if p != "CSGOTeamBot":
+                        stats = []
+                        cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER=(%s) LIMIT 1", (p,))
                         stats = cur.fetchall()
+                        if len(stats) == 0:
+                            cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
+                            stats = cur.fetchall()
+                    elif p == "CSGOTeamBot":
+                        stats = [("n/a", "Gabe Newell", "12", "U-Bot", "6969", "101", "100", "9.99", "?pageid=179&teamid=6060")]
                     if len(stats) > 0:
                         personal = stats[0][1:4] + (stats[0][9],)
                         if str(personal[2]) == '99':
@@ -398,6 +401,7 @@ while True:
                         print HSRating
                         link = stats[0][8]
                         print link
+                    if p != "CSGOTeamBot" and len(stats) > 0:
                         cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1",
                                     (personal[-1],))
                         tlink = cur.fetchall()
