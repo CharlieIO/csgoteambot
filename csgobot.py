@@ -393,7 +393,6 @@ while True:
                             stats = []
                             cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER=(%s) LIMIT 1", (p,))
                             stats = cur.fetchall()
-<<<<<<< HEAD
                             if len(stats) == 0:
                                 cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
                                 stats = cur.fetchall()
@@ -406,17 +405,6 @@ while True:
                             print personal  # Player, Name, Age, team
                             KD = stats[0][4:6]
                             print KD  # Kills, Deaths
-=======
-                    elif p == "CSGOTeamBot":
-                        stats = [("n/a", "Gabe Newell", "12", "U-Bot", "6969", "101", "100", "9.99", "?pageid=179&teamid=6060")]
-                    if len(stats) > 0:
-                        personal = stats[0][1:4] + (stats[0][9],)
-                        if str(personal[2]) == '99':
-                            personal = personal[0:2] + ('Age data not available.',) + personal[3:]
-                        print personal  # Player, Name, Age, team
-                        KD = stats[0][4:6]
-                        print KD  # Kills, Deaths
->>>>>>> parent of aa012f7... bug fix for special case
 
                             HSRating = stats[0][6:8]
                             print HSRating
