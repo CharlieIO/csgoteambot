@@ -303,8 +303,8 @@ while True:
     subreddit = r.get_subreddit('globaloffensive')
     comments = subreddit.get_comments()
     flat_comments = praw.helpers.flatten_tree(comments)
-    comment_reply = ""
     for comment in flat_comments:
+        comment_reply = ""
         print comment
         call_count = get_count(comment)
         
