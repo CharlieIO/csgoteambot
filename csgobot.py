@@ -225,7 +225,7 @@ def statScrape(teamlink):
     # other stats are maps played, total kills, total deaths, rounds played, K/D ratio
 
 
-def get_team(comment, which_instance=0):
+def get_team(comment, which_instance):
     instance_count = 0
     comment = str(comment).split()
     for num in range(len(comment)):
