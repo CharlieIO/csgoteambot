@@ -438,7 +438,7 @@ while True:
                     HSRating = []
                     link = []
             palready_done.append(comment.id)
-        if comment_reply == "":
+        if not comment_reply == "":
             try:
                 comment.reply(comment_reply)
                 print "~~~~~~~~~Comment posted.~~~~~~~~~"
