@@ -69,7 +69,10 @@ CSGOTeamBot supports multiple calls in one comment, so `!team nip !player get_ri
 [HLTV.org](http://hltv.org/) - Source of all the statistics
 
 ## Contact
+#####For questions or comments:
 
 [Developer's Steam](https://steamcommunity.com/id/CHARKbite/)
 
 [Email](mailto:charrod796@gmail.com)
+
+[Reddit](https://www.reddit.com/user/csgoteambot)
