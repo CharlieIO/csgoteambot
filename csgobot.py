@@ -438,7 +438,7 @@ while True:
                         print '~~~~~~ERROR2~~~~~~'
                         pass
                     if len(stats) > 0:
-                        comment_reply = comment_reply + '   ##Information for **[' + personal[
+                        comment_reply = comment_reply + '##Information for **[' + personal[
                             0] + '](http://www.hltv.org/' + link + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
                     stats = []
                     KD = []
