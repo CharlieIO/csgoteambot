@@ -12,9 +12,13 @@ url = urlparse.urlparse(os.environ["DATABASE_URL"])
 
 
 def auto_scrape():
+    '''
+    Used to update the database
+    @return:
+    '''
     tcount = 0
     pcount = 0
-    teamlink = teamLinks()
+    teamlink = teamLinks() #gets dict with teams as keys and links as values
     for tname in teamlink:
         tlink = teamlink[tname]
         players, playerlink = tScrape(tlink)
@@ -358,7 +362,7 @@ while True:
                     if len(stats) > 0:
                         if link:
                             print format_text
-                            comment_reply = comment_reply + '##Information for **[' + team.replace('&nbsp;', '').replace(
+                            comment_reply = comment_reply + '###Information for **[' + team.replace('&nbsp;', '').replace(
                                 '%20',
                                 ' ').upper() + '](http://hltv.org/' + link + ')**:' + (
                                                 (
@@ -368,7 +372,7 @@ while True:
                             print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
                         else:
                             print format_text
-                            comment_reply = comment_reply + '##Information for **' + team.replace('&nbsp;', '').replace(
+                            comment_reply = comment_reply + '###Information for **' + team.replace('&nbsp;', '').replace(
                                 '%20',
                                 ' ').upper() + '**:' + (
                                                 (
@@ -438,7 +442,7 @@ while True:
                         print '~~~~~~ERROR2~~~~~~'
                         pass
                     if len(stats) > 0:
-                        comment_reply = comment_reply + '##Information for **[' + personal[
+                        comment_reply = comment_reply + '###Information for **[' + personal[
                             0] + '](http://www.hltv.org/' + link + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
                     stats = []
                     KD = []
