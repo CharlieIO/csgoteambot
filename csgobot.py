@@ -196,7 +196,7 @@ def team_database_update_nolink(tname, p1, p2, p3, p4, p5):
     cur = conn.cursor()
     cur.execute("SELECT TEAM_NAME FROM csgo_teams")
     teamnames = cur.fetchall()
-    print tname
+    tname = tname.encode('latin1')
     if tname not in teamnames:
         cur.execute(
             "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5) VALUES (%s, %s, %s, %s, %s, %s)",
@@ -288,13 +288,13 @@ def show_table():
     # print "\nShow me the databases:\n"
     # for row in rows:
     #     print "   ", row
-    # conn.commit()
+    conn.commit()
     print 'done'
     conn.close()
 
 show_table()
 auto_scrape()
-time.sleep(9999999999999999999)
+time.sleep(99999999999999999)
 # r = praw.Reddit('An easy way to access team rosters.')
 # r.login(os.environ['REDDIT_USER'], os.environ['REDDIT_PASS'])
 # rcall = ['!roster', '!team']
@@ -327,8 +327,7 @@ time.sleep(9999999999999999999)
 #                 if team != '!roster' and team != '!team' and any(
 #                         (c in forbidden) for c in team) == False and forbidden2 not in team.upper():
 #                     stats = []
-#                     if True:
-#                     # try:
+#                     try:
 #                         stats = []
 #                         if team.upper() == 'VP':
 #                             team.replace('VP', 'Virtus.Pro')
@@ -358,15 +357,15 @@ time.sleep(9999999999999999999)
 #                             for num in range(5):
 #                                 unite.append(players[num])
 #                                 unite.append(fixed_rating[num])
-#                     # except:
+#                     except:
 #                         print '~~~~~~ERROR1.~~~~~~'
 #                         pass
-#                     # try:
+#                     try:
 #                         if len(stats) > 0:
 #                             format_text = ('\n\nPlayer | Rating ' + '\n:--:|:--:' + ((
 #                                 '\n %s | %s ' * 5)) + (statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
 #                                 round((float(tstats[0]) / float(tstats[2])), 2)))
-#                     # except:
+#                     except:
 #                         print '~~~~~~ERROR2~~~~~~'
 #                         pass
 #                     if len(stats) > 0:
@@ -407,8 +406,7 @@ time.sleep(9999999999999999999)
 #                 if p != '!roster' and p != '!team' and any(
 #                         (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
 #                     stats = []
-#                     # try:
-#                     if True:
+#                     try:
 #                         if p != "CSGOTeamBot":
 #                             stats = []
 #                             cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER=(%s) LIMIT 1", (p,))
@@ -437,10 +435,10 @@ time.sleep(9999999999999999999)
 #                             tlink = cur.fetchall()
 #                             tlink = tlink[0][0]
 #                             print tlink
-#                     # except:
+#                     except:
 #                         print '~~~~~~ERROR1~~~~~~'
 #                         pass
-#                     # try:
+#                     try:
 #                         if len(stats) > 0:
 #                             format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[
 #                                 1] + '**\nAge: | **' + \
@@ -449,7 +447,7 @@ time.sleep(9999999999999999999)
 #                                 KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
 #                                 round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
 #                                 HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
-#                     # except:
+#                     except:
 #                         print '~~~~~~ERROR2~~~~~~'
 #                         pass
 #                     if len(stats) > 0:
