@@ -247,16 +247,19 @@ def get_team(comment, which_instance):
                 else:
                     if len(comment[num + 1]) < 50:
                         return comment[num + 1]
-            instance_count = instance_count + 1
+            instance_count += 1
+
 
 def get_count(comment):
-    count = 0
+    tcount = 0
+    pcount = 0
     comment = str(comment).split()
     for num in range(len(comment)):
         if comment[num] == '!roster' or comment[num] == '!team' or comment[num] == '!player' or comment[
             num] == '!rektby':
-            count = count + 1
-    return count
+            tcount += 1
+            pcount += 1
+    return tcount, pcount
 
 
 def show_table():
@@ -306,10 +309,10 @@ while True:
     for comment in flat_comments:
         comment_reply = ""
         print comment
-        call_count = get_count(comment)
-        
+        tcall_count, pcall_count = get_count(comment)
+
         if comment.id not in talready_done:
-            for instance in range(call_count):
+            for instance in range(tcall_count):
                 team = get_team(comment.body, instance)
                 statfill = '\n\n**Wins:** %s' + ' \n\n**Draws:** %s' + ' \n\n**Losses:** %s' + ' \n\n**Rounds Played:**  %s '
                 if team != '!roster' and team != '!team' and any(
@@ -355,21 +358,23 @@ while True:
                     if len(stats) > 0:
                         if link:
                             print format_text
-                            comment_reply = comment_reply + 'Information for **[' + team.replace('&nbsp;', '').replace('%20',
-                                                                                            ' ').upper() + '](http://hltv.org/' + link + ')**:' + (
-                                    (
-                                        format_text) % (
-                                        tuple(
-                                            unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
+                            comment_reply = comment_reply + 'Information for **[' + team.replace('&nbsp;', '').replace(
+                                '%20',
+                                ' ').upper() + '](http://hltv.org/' + link + ')**:' + (
+                                                (
+                                                    format_text) % (
+                                                    tuple(
+                                                        unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
                             print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
                         else:
                             print format_text
-                            comment_reply = comment_reply + 'Information for **' + team.replace('&nbsp;', '').replace('%20',
-                                                                                            ' ').upper() + '**:' + (
-                                    (
-                                        format_text) % (
-                                        tuple(
-                                            unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/) \n\n'
+                            comment_reply = comment_reply + 'Information for **' + team.replace('&nbsp;', '').replace(
+                                '%20',
+                                ' ').upper() + '**:' + (
+                                                (
+                                                    format_text) % (
+                                                    tuple(
+                                                        unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/) \n\n'
 
                 unite = []
                 tstats = []
@@ -378,12 +383,12 @@ while True:
                 link = []
                 player_ratings = []
             talready_done.append(comment.id)
-            time.sleep(3)
+
 
             # ---------------------------------------------Player called-----------------------------------------------------
-        
-        if comment.id not in talready_done:
-            for instance in range(call_count):
+
+        if comment.id not in palready_done:
+            for instance in range(pcall_count):
                 p = get_team(comment.body, instance)
                 if p != '!roster' and p != '!team' and any(
                         (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
@@ -397,7 +402,8 @@ while True:
                                 cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
                                 stats = cur.fetchall()
                         elif p == "CSGOTeamBot":
-                            stats = [("n/a", "you now me on reddit nice", "Gabe Newell", "12", "6969", "101", "100", "9.99", "?pageid=179&teamid=6060", "U-Bot")]
+                            stats = [("n/a", "you now me on reddit nice", "Gabe Newell", "12", "6969", "101", "100",
+                                      "9.99", "?pageid=179&teamid=6060", "U-Bot")]
                         if len(stats) > 0:
                             personal = stats[0][1:4] + (stats[0][9],)
                             if str(personal[2]) == '99':
@@ -423,7 +429,8 @@ while True:
                         if len(stats) > 0:
                             format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[
                                 1] + '**\nAge: | **' + \
-                                          personal[2] + '**\nPrimary Team: | **' + personal[3] + '**\nKills: | **' + str(
+                                          personal[2] + '**\nPrimary Team: | **' + personal[
+                                              3] + '**\nKills: | **' + str(
                                 KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
                                 round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
                                 HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
@@ -432,12 +439,12 @@ while True:
                         pass
                     if len(stats) > 0:
                         comment_reply = comment_reply + '   Information for **[' + personal[
-                                0] + '](http://www.hltv.org/' + link + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
+                            0] + '](http://www.hltv.org/' + link + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
                     stats = []
                     KD = []
                     HSRating = []
                     link = []
-            palready_done.append(comment.id)
+                    palready_done.append(comment.id)
         if not comment_reply == "":
             try:
                 comment.reply(comment_reply)
