@@ -199,7 +199,7 @@ def team_database_update_nolink(tname, p1, p2, p3, p4, p5):
     print tname
     if tname not in teamnames:
         cur.execute(
-            "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS) VALUES (%s, %s, %s, %s, %s, %s)",
+            "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5) VALUES (%s, %s, %s, %s, %s, %s)",
             (tname, p1, p2, p3, p4, p5))
         print '\nNew Team Added Successfully'
     else:
