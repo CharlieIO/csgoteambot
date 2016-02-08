@@ -24,7 +24,7 @@ def auto_scrape():
         players, playerlink = tScrape(tlink)
         win, draw, loss, mapsplayed, kills, deaths, rounds, kdratio = statScrape(tlink)
         for player in playerlink:
-           try:
+           # try:
                 plink = playerlink[player]
                 p1, p2, p3, p4 = otherPlayers(plink)
                 tcount += 1
@@ -39,7 +39,7 @@ def auto_scrape():
                 pcount += 1
                 print player + ' has been modified. \n' + str(pcount) + ' players modified. #' + team
                 time.sleep(3)
-           except:
+           # except:
                 print 'error'
                 pass
                 # name, age, team, K, HSP, D, Rating
@@ -130,7 +130,7 @@ def player_database_update(player, name, age, team, k, d, hsp, rating, link):
     cur.execute("SELECT LINK FROM CSGO_PLAYERS")
     linklist = cur.fetchall()
     try:
-        if (link.encode('latin1'),) not in linklist:
+        if link not in linklist:
             cur.execute(
                 "INSERT INTO CSGO_PLAYERS (PLAYER, IRLNAME, AGE, TEAM, KILLS, DEATHS, HSP, RATING, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (player, name, age, team, k, d, hsp, rating, link))
@@ -163,7 +163,7 @@ def team_database_update(tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, lin
     cur = conn.cursor()
     cur.execute("SELECT LINK FROM csgo_teams")
     linklist = cur.fetchall()
-    if (link.encode('latin1'),) not in linklist:
+    if link not in linklist:
         cur.execute(
             "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS, LINK) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
             (tname, p1, p2, p3, p4, p5, win, draw, loss, rounds, link))
@@ -196,7 +196,8 @@ def team_database_update_nolink(tname, p1, p2, p3, p4, p5):
     cur = conn.cursor()
     cur.execute("SELECT TEAM_NAME FROM csgo_teams")
     teamnames = cur.fetchall()
-    if (tname.encode('latin1'),) not in teamnames:
+    print tname
+    if tname not in teamnames:
         cur.execute(
             "INSERT INTO CSGO_TEAMS (TEAM_NAME, PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER5, WINS, DRAWS, LOSSES, ROUNDS) VALUES (%s, %s, %s, %s, %s, %s)",
             (tname, p1, p2, p3, p4, p5))
@@ -276,10 +277,12 @@ def show_table():
     )
     cur = conn.cursor()
     print 'connected'
+    cur.execute("DELETE FROM CSGO_PLAYERS")
+    cur.execute("DELETE FROM CSGO_TEAMS")
     # cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER LIKE UPPER(%s) LIMIT 1", ('coldzera'.upper(),))
-    stats = cur.fetchall()
-    print len(stats)
-    print stats
+    # stats = cur.fetchall()
+    # print len(stats)
+    # print stats
     # cur.execute("ALTER TABLE CSGO_PLAYERS ALTER COLUMN HSP SET DATA TYPE NUMERIC (3,1)")
     # rows = cur.fetchall()
     # print "\nShow me the databases:\n"
@@ -289,7 +292,7 @@ def show_table():
     print 'done'
     conn.close()
 
-
+show_table()
 auto_scrape()
 time.sleep(9999999999999999999)
 # r = praw.Reddit('An easy way to access team rosters.')
