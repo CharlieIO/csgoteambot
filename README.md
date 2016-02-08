@@ -66,6 +66,8 @@ CSGOTeamBot supports multiple calls in one comment, so `!team nip !player get_ri
 
 [Fatbird3](https://github.com/Fatbird3) - Help with testing and code-cleanup
 
+[HLTV.org](http://hltv.org/) - Source of all the statistics
+
 ## Contact
 
 [Developer's Steam](https://steamcommunity.com/id/CHARKbite/)
