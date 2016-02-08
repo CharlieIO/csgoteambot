@@ -24,7 +24,7 @@ def auto_scrape():
         players, playerlink = tScrape(tlink)
         win, draw, loss, mapsplayed, kills, deaths, rounds, kdratio = statScrape(tlink)
         for player in playerlink:
-           # try:
+           try:
                 plink = playerlink[player]
                 p1, p2, p3, p4 = otherPlayers(plink)
                 tcount += 1
@@ -39,7 +39,7 @@ def auto_scrape():
                 pcount += 1
                 print player + ' has been modified. \n' + str(pcount) + ' players modified. #' + team
                 time.sleep(3)
-           # except:
+           except:
                 print 'error'
                 pass
                 # name, age, team, K, HSP, D, Rating
