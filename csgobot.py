@@ -357,8 +357,8 @@ def show_table():
     )
     cur = conn.cursor()
     print 'connected'
-    cur.execute("DELETE FROM CSGO_PLAYERS")
-    cur.execute("DELETE FROM CSGO_TEAMS")
+    # cur.execute("DELETE FROM CSGO_PLAYERS")
+    # cur.execute("DELETE FROM CSGO_TEAMS")
     # cur.execute("SELECT LINK FROM CSGO_TEAMS*")
     # stats = cur.fetchall()
     # print len(stats)
@@ -372,9 +372,8 @@ def show_table():
     print 'done'
     conn.close()
 
-show_table()
 auto_scrape()
-time.sleep(9999999999999999999)
+time.sleep(99999999)
 
 # r = praw.Reddit('An easy way to access team rosters and stats.')
 # r.login(os.environ['REDDIT_USER'], os.environ['REDDIT_PASS'])
