@@ -1,6 +1,6 @@
 # CSGOTeamBot
 
-A Python bot for [/r/globaloffensive](http://www.reddit.com/r/globaloffensive), powered by [HLTV](http://www.hltv.org)'s statistics. Easily access specific team and player stats, instantly.
+A Python bot for [/r/globaloffensive](http://www.reddit.com/r/globaloffensive), powered by [HLTV](http://www.hltv.org)'s statistics. Access specific team and player stats, instantly.
 
 ## Usage
 
