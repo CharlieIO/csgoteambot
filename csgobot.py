@@ -306,11 +306,11 @@ def get_team(comment, which_instance):
     comment = str(comment).split()
     for num in range(len(comment)):
         if comment[num] == '!roster' or comment[num] == '!team' or comment[num] == '!player' or comment[
-            num] == '!rektby': #finds hotword
-            if instance_count == which_instance: #ensures correct return
+            num] == '!rektby':
+            if instance_count == which_instance:  # ensures correct return
                 if comment[num + 1][0] == '"':  # for multi-word teams, players.
                     if comment[num + 1][-1] == '"':
-                        if len(str(comment[num + 1][1:-1])) < 50: # can't be too long
+                        if len(str(comment[num + 1][1:-1])) < 50:  # can't be too long
                             return str(comment[num + 1][1:-1])
                     elif comment[num + 2][-1] == '"' and comment[num + 1][-1] != '"':  # if it is 2 words
                         if len(str(comment[num + 1][1:] + ' ' + comment[num + 2][:-1])) < 50:
@@ -319,7 +319,7 @@ def get_team(comment, which_instance):
                         if len(str(comment[num][1:] + ' ' + comment[num + 2][:] + ' ' + comment[num + 3][:-1])) < 50:
                             return str(comment[num][1:] + ' ' + comment[num + 2][:] + ' ' + comment[num + 3][:-1])
                     else:
-                        return 'DROP' #banned keyword, just an easy way to say "don't make a post"
+                        return 'DROP'  # banned keyword, just an easy way to say "don't make a post"
                 else:
                     if len(comment[num + 1]) < 50:
                         return comment[num + 1]
@@ -359,27 +359,28 @@ def show_table():
     print 'connected'
     # cur.execute("DELETE FROM CSGO_PLAYERS")
     # cur.execute("DELETE FROM CSGO_TEAMS")
-    # cur.execute("SELECT LINK FROM CSGO_TEAMS*")
-    # stats = cur.fetchall()
-    # print len(stats)
-    # print stats
+    cur.execute("SELECT TEAM_NAME FROM CSGO_TEAMS*")
+    stats = cur.fetchall()
+    print len(stats)
+    print stats
     # cur.execute("ALTER TABLE CSGO_PLAYERS ALTER COLUMN HSP SET DATA TYPE NUMERIC (3,1)")
     # rows = cur.fetchall()
     # print "\nShow me the databases:\n"
     # for row in rows:
     #     print "   ", row
-    conn.commit()
+    # conn.commit()
     print 'done'
     conn.close()
 
+
 r = praw.Reddit('An easy way to access team rosters and stats.')
 r.login(os.environ['REDDIT_USER'], os.environ['REDDIT_PASS'])
-rcall = ['!roster', '!team'] #words to call by
+rcall = ['!roster', '!team']  # words to call by
 pcall = ['!player', '!rektby']
 talready_done = []
 palready_done = []
-forbidden = '+%\\*;[]{}:"' #forbidden characters
-forbidden2 = 'DROP' #forbidden keyword
+forbidden = '+%\\*;[]{}:"'  # forbidden characters
+forbidden2 = 'DROP'  # forbidden keyword
 while True:
     conn = psycopg2.connect(
         database=url.path[1:],
@@ -392,35 +393,52 @@ while True:
     subreddit = r.get_subreddit('globaloffensive')
     comments = subreddit.get_comments()
     flat_comments = praw.helpers.flatten_tree(comments)
-    for comment in flat_comments: #all the comments posted in the subreddit
-        comment_reply = "" #will append to this later
+    for comment in flat_comments:  # all the comments posted in the subreddit
+        comment_reply = ""  # will append to this later
         print comment
         tcall_count, pcall_count = get_count(comment)
-        if comment.id not in talready_done: #talready_done is a list of comment id's where I have already
+        if comment.id not in talready_done:  # talready_done is a list of comment id's where I have already
             for instance in range(tcall_count):
                 team = get_team(comment.body, instance)
-                statfill = '\n\n**Wins:** %s' + ' \n\n**Draws:** %s' + ' \n\n**Losses:** %s' + ' \n\n**Rounds Played:**  %s ' #layout for commenting
+                statfill = '\n\n**Wins:** %s' + ' \n\n**Draws:** %s' + ' \n\n**Losses:** %s' + ' \n\n**Rounds Played:**  %s '  # layout for commenting
                 if team != '!roster' and team != '!team' and any(
                         (c in forbidden) for c in team) == False and forbidden2 not in team.upper():
                     stats = []
                     try:
                         stats = []
                         if team.upper() == 'VP':
-                            team.replace('VP', 'Virtus.Pro') #single common case exception
-                        cur.execute("SELECT * FROM CSGO_TEAMS WHERE TEAM_NAME=(%s) LIMIT 1", (team,)) #
+                            team.replace('VP', 'Virtus.Pro')  # single common case exception
+                        cur.execute("SELECT * FROM CSGO_TEAMS WHERE TEAM_NAME=(%s) LIMIT 1", (team,))  #
                         stats = cur.fetchall()
                         if len(stats) == 0:
                             cur.execute(
                                 "SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) AND PLAYER5 IS NOT NULL LIMIT 1",
                                 (team,))
                             stats = cur.fetchall()
-                        if len(stats) > 0:
+                        print stats
+                        if len(stats) > 6:
                             unite = []
                             tstats = stats[0][6:10]
                             players = stats[0][1:6]
-                            team = stats[0][0] #assigns statistics
+                            team = stats[0][0]  # assigns statistics
                             link = stats[0][10]
                             player_ratings = []
+                            for player in players:
+                                cur.execute("SELECT RATING FROM CSGO_PLAYERS WHERE PLAYER=(%s)",
+                                            (player,))
+                                playerrating = cur.fetchall()
+                                if len(playerrating) > 0:
+                                    player_ratings += playerrating[0]
+                                else:
+                                    player_ratings += ['Rating not found.']
+                            fixed_rating = []
+                            for rate in player_ratings:
+                                fixed_rating += [str(rate)]
+                            for num in range(5):
+                                unite.append(players[num])
+                                unite.append(fixed_rating[num])
+                        if len(stats) == 6:
+                            players = stats[0][1:6]
                             for player in players:
                                 cur.execute("SELECT RATING FROM CSGO_PLAYERS WHERE PLAYER=(%s)",
                                             (player,))
@@ -439,28 +457,40 @@ while True:
                         print '~~~~~~ERROR1.~~~~~~'
                         pass
                     try:
-                        if len(stats) > 0:
+                        if len(stats) > 6:
                             format_text = ('\n\nPlayer | Rating ' + '\n:--:|:--:' + ((
                                 '\n %s | %s ' * 5)) + (statfill % (tuple(tstats))) + '\n\n**Win/Loss Ratio:** ' + str(
                                 round((float(tstats[0]) / float(tstats[2])), 2)))
+                        if len(stats) == 6:
+                            format_text = ('\n\nPlayer | Rating ' + '\n:--:|:--:' + ((
+                                '\n %s | %s ' * 5)))
+
                     except:
                         print '~~~~~~ERROR2~~~~~~'
                         pass
-                    if len(stats) > 0:
-                        if link:
-                            print format_text
-                            comment_reply = comment_reply + '###Information for **[' + team.replace('&nbsp;',
-                                                                                                    '').replace(
-                                '%20',
-                                ' ').upper() + '](http://hltv.org/' + link + ')**:' + (
-                                                (
-                                                    format_text) % (
-                                                    tuple(
-                                                        unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
-                            print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
-                        else:
-                            print format_text
-                            comment_reply = comment_reply + '###Information for **' + team.replace('&nbsp;',
+                    try:
+                        if len(stats) > 6:
+                            if link:
+                                comment_reply = comment_reply + '###Information for **[' + team.replace('&nbsp;',
+                                                                                                        '').replace(
+                                    '%20',
+                                    ' ').upper() + '](http://hltv.org/' + str(link) + ')**:' + (
+                                                    (
+                                                        format_text) % (
+                                                        tuple(
+                                                            unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
+                                print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
+                            else:
+                                comment_reply = comment_reply + '###Information for **' + team.replace('&nbsp;',
+                                                                                                       '').replace(
+                                    '%20',
+                                    ' ').upper() + '**:' + (
+                                                    (
+                                                        format_text) % (
+                                                        tuple(
+                                                            unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/) \n\n'
+                        if len(stats) == 6:
+                            comment_reply = comment_reply + '###Limited information (<10 maps played) for **' + team.replace('&nbsp;',
                                                                                                    '').replace(
                                 '%20',
                                 ' ').upper() + '**:' + (
@@ -469,6 +499,8 @@ while True:
                                                     tuple(
                                                         unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/) \n\n'
 
+                    except:
+                        print '~~~~~~~~ERROR3~~~~~~~~~'
                 unite = []
                 tstats = []
                 players = []
@@ -532,7 +564,8 @@ while True:
                         pass
                     if len(stats) > 0:
                         comment_reply = comment_reply + '###Information for **[' + personal[
-                            0] + '](http://www.hltv.org/' + link + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
+                            0] + '](http://www.hltv.org/' + str(
+                            link) + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
                     stats = []
                     KD = []
                     HSRating = []
