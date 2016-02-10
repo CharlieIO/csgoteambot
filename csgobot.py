@@ -419,10 +419,10 @@ while True:
                         print len(stats)
                         if len(stats) > 6:
                             unite = []
-                            tstats = stats[0][6:10]
-                            players = stats[0][1:6]
-                            team = stats[0][0]  # assigns statistics
-                            link = stats[0][10]
+                            tstats = stats[6:10]
+                            players = stats[1:6]
+                            team = stats[0]  # assigns statistics
+                            link = stats[10]
                             player_ratings = []
                             for player in players:
                                 cur.execute("SELECT RATING FROM CSGO_PLAYERS WHERE PLAYER=(%s)",
