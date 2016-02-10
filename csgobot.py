@@ -477,73 +477,73 @@ while True:
                 player_ratings = []
             talready_done.append(comment.id)
 
-#
-#             # ---------------------------------------------Player called-----------------------------------------------------
-#
-#         if comment.id not in palready_done:
-#             for instance in range(pcall_count):
-#                 p = get_team(comment.body, instance)
-#                 if p != '!roster' and p != '!team' and any(
-#                         (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
-#                     stats = []
-#                     try:
-#                         if p != "CSGOTeamBot":
-#                             stats = []
-#                             cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER=(%s) LIMIT 1", (p,))
-#                             stats = cur.fetchall()
-#                             if len(stats) == 0:
-#                                 cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
-#                                 stats = cur.fetchall()
-#                         elif p == "CSGOTeamBot":
-#                             stats = [("n/a", "you now me on reddit nice", "Gabe Newell", "12", "6969", "101", "100",
-#                                       "9.99", "?pageid=179&teamid=6060", "U-Bot")]
-#                         if len(stats) > 0:
-#                             personal = stats[0][1:4] + (stats[0][9],)
-#                             if str(personal[2]) == '99':
-#                                 personal = personal[0:2] + ('Age data not available.',) + personal[3:]
-#                             print personal  # Player, Name, Age, team
-#                             KD = stats[0][4:6]
-#                             print KD  # Kills, Deaths
-#
-#                             HSRating = stats[0][6:8]
-#                             print HSRating
-#                             link = stats[0][8]
-#                             print link
-#                         if p != "CSGOTeamBot" and len(stats) > 0:
-#                             cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1",
-#                                         (personal[-1],))
-#                             tlink = cur.fetchall()
-#                             tlink = tlink[0][0]
-#                             print tlink
-#                     except:
-#                         print '~~~~~~ERROR1~~~~~~'
-#                         pass
-#                     try:
-#                         if len(stats) > 0:
-#                             format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[
-#                                 1] + '**\nAge: | **' + \
-#                                           personal[2] + '**\nPrimary Team: | **' + personal[
-#                                               3] + '**\nKills: | **' + str(
-#                                 KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
-#                                 round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
-#                                 HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
-#                     except:
-#                         print '~~~~~~ERROR2~~~~~~'
-#                         pass
-#                     if len(stats) > 0:
-#                         comment_reply = comment_reply + '###Information for **[' + personal[
-#                             0] + '](http://www.hltv.org/' + link + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
-#                     stats = []
-#                     KD = []
-#                     HSRating = []
-#                     link = []
-#                     palready_done.append(comment.id)
-#         if not comment_reply == "":
-#             try:
-#                 comment.reply(comment_reply)
-#                 print "~~~~~~~~~Comment posted.~~~~~~~~~"
-#             except:
-#                 print '~~~~~~ERROR3~~~~~~'
-#                 pass
-#     conn.close()
-#     time.sleep(10)
+
+            # ---------------------------------------------Player called-----------------------------------------------------
+
+        if comment.id not in palready_done:
+            for instance in range(pcall_count):
+                p = get_team(comment.body, instance)
+                if p != '!roster' and p != '!team' and any(
+                        (c in forbidden) for c in p) == False and forbidden2 not in p.upper():
+                    stats = []
+                    try:
+                        if p != "CSGOTeamBot":
+                            stats = []
+                            cur.execute("SELECT * FROM CSGO_PLAYERS WHERE PLAYER=(%s) LIMIT 1", (p,))
+                            stats = cur.fetchall()
+                            if len(stats) == 0:
+                                cur.execute("SELECT * FROM CSGO_PLAYERS WHERE UPPER(PLAYER)=UPPER(%s) LIMIT 1", (p,))
+                                stats = cur.fetchall()
+                        elif p == "CSGOTeamBot":
+                            stats = [("n/a", "you now me on reddit nice", "Gabe Newell", "12", "6969", "101", "100",
+                                      "9.99", "?pageid=179&teamid=6060", "U-Bot")]
+                        if len(stats) > 0:
+                            personal = stats[0][1:4] + (stats[0][9],)
+                            if str(personal[2]) == '99':
+                                personal = personal[0:2] + ('Age data not available.',) + personal[3:]
+                            print personal  # Player, Name, Age, team
+                            KD = stats[0][4:6]
+                            print KD  # Kills, Deaths
+
+                            HSRating = stats[0][6:8]
+                            print HSRating
+                            link = stats[0][8]
+                            print link
+                        if p != "CSGOTeamBot" and len(stats) > 0:
+                            cur.execute("SELECT LINK FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) LIMIT 1",
+                                        (personal[-1],))
+                            tlink = cur.fetchall()
+                            tlink = tlink[0][0]
+                            print tlink
+                    except:
+                        print '~~~~~~ERROR1~~~~~~'
+                        pass
+                    try:
+                        if len(stats) > 0:
+                            format_text = 'Stats | Values' + '\n:--|:--:' + '\nReal Name: | **' + personal[
+                                1] + '**\nAge: | **' + \
+                                          personal[2] + '**\nPrimary Team: | **' + personal[
+                                              3] + '**\nKills: | **' + str(
+                                KD[0]) + '**\nDeaths: | **' + str(KD[1]) + '**\nKill/Death Ratio: | **' + str(
+                                round((float(KD[0]) / float(KD[1])), 2)) + '**\nHSP: | **' + str(
+                                HSRating[0]) + '%**\nHLTV Rating: | **' + str(HSRating[1]) + '**'
+                    except:
+                        print '~~~~~~ERROR2~~~~~~'
+                        pass
+                    if len(stats) > 0:
+                        comment_reply = comment_reply + '###Information for **[' + personal[
+                            0] + '](http://www.hltv.org/' + link + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
+                    stats = []
+                    KD = []
+                    HSRating = []
+                    link = []
+                    palready_done.append(comment.id)
+        if not comment_reply == "":
+            try:
+                comment.reply(comment_reply)
+                print "~~~~~~~~~Comment posted.~~~~~~~~~"
+            except:
+                print '~~~~~~ERROR3~~~~~~'
+                pass
+    conn.close()
+    time.sleep(10)
