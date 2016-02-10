@@ -415,7 +415,8 @@ while True:
                                 "SELECT * FROM CSGO_TEAMS WHERE UPPER(TEAM_NAME)=UPPER(%s) AND PLAYER5 IS NOT NULL LIMIT 1",
                                 (team,))
                             stats = cur.fetchall()
-                        print stats
+                        stats = [x for x in stats[0] if x is not None]
+                        print len(stats)
                         if len(stats) > 6:
                             unite = []
                             tstats = stats[0][6:10]
@@ -438,7 +439,10 @@ while True:
                                 unite.append(players[num])
                                 unite.append(fixed_rating[num])
                         if len(stats) == 6:
-                            players = stats[0][1:6]
+                            player_ratings = []
+                            unite = []
+                            print stats[1:6]
+                            players = stats[1:6]
                             for player in players:
                                 cur.execute("SELECT RATING FROM CSGO_PLAYERS WHERE PLAYER=(%s)",
                                             (player,))
@@ -454,7 +458,7 @@ while True:
                                 unite.append(players[num])
                                 unite.append(fixed_rating[num])
                     except:
-                        print '~~~~~~ERROR1.~~~~~~'
+                        print '~~~~~~ERROR1~~~~~~'
                         pass
                     try:
                         if len(stats) > 6:
