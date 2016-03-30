@@ -55,7 +55,9 @@ CSGOTeamBot supports multiple calls in one comment, so `!team nip !player get_ri
 2. Create your feature branch: `git checkout -b my-new-feature`
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request!
+5. Submit a pull request! 
+
+<b> Note: </b> I will not provide database access. The best way to test functionality of your feature is by creating sample data within your code. If you would like to build your own database, the source for my scraper is provided [here](https://github.com/Charrod/CSGOTeamBotScraper/blob/master/scraper.py).
 
 
 ## Credits
