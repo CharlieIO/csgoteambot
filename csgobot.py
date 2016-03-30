@@ -208,14 +208,14 @@ def main():
                             if len(stats) > 6:
                                 if link:
                                     comment_reply = comment_reply + '###Information for **[' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '](http://hltv.org/' + str(link) + ')**:' + ((format_text) % (tuple(
-                                        unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/CharlieIO/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
+                                        unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/CharlieIO/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CharlieIO/)\n\n'
                                     print "~~~~~~~~~Team Comment posted.~~~~~~~~~"
                                 else:
                                     comment_reply = comment_reply + '###Information for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + ((format_text) % (tuple(
-                                        unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/CharlieIO/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/) \n\n'
+                                        unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/CharlieIO/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CharlieIO/) \n\n'
                             if len(stats) == 6:
                                 comment_reply = comment_reply + '###Limited information (<10 maps played) for **' + team.replace('&nbsp;', '').replace('%20', ' ').upper() + '**:' + ((format_text) % (tuple(
-                                    unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/CharlieIO/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/) \n\n'
+                                    unite))) + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/CharlieIO/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CharlieIO/) \n\n'
 
                         except:
                             print '~~~~~~~~ERROR3~~~~~~~~~'
@@ -287,7 +287,7 @@ def main():
                             pass
                         if len(stats) > 0:
                             comment_reply = comment_reply + '###Information for **[' + personal[0] + '](http://www.hltv.org/' + str(
-                                link) + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/Charrod/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CHARKbite/)\n\n'
+                                link) + ')**:\n\n' + format_text + '\n\n [Powered by HLTV](http://www.hltv.org/)\n\n [GitHub Source](https://github.com/CharlieIO/csgoteambot) // [Developer\'s Steam](https://steamcommunity.com/id/CharlieIO/)\n\n'
                         KD = []
                         HSRating = []
                         link = []
