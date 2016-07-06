@@ -1,4 +1,5 @@
 # CSGOTeamBot
+#####NOTE: /u/CSGOTeambot is no longer active. After a fun few months the amount of use diminished, so I had to retire the bot. If anyone is interested in reviving the project, send me a message.
 
 A Python bot for [/r/globaloffensive](http://www.reddit.com/r/globaloffensive), powered by [HLTV](http://www.hltv.org)'s statistics. Access specific team and player stats, instantly.
 
